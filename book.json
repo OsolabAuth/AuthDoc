@@ -1,0 +1,9 @@
+{
+  "plugins": ["plantuml-server"],
+  "pluginsConfig": {
+    "plantuml-server": {
+      "server": "https://www.plantuml.com/plantuml",
+    "format": "png"
+    }
+  }
+}
