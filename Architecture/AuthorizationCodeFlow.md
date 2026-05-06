@@ -204,16 +204,15 @@ group 認可エンドポイント
 
 end
 group トークンエンドポイント
-    Client -> auth : Post(api/auth/token)
+    Client -> auth : Post(/token)
     note right
         Header
             x-flow-type: AuthorizationCode
             Content-Type : application/json
+            Authorizatioon : Basic Base64(クライアントID:クライアントシークレット)
         Body
         {
             "grant_type": authorization_code
-            "client_id":クライアントID
-            "client_secret":クライアントシークレット
             "code_verifier": code_verifier
             "code" : 認可コード
         }

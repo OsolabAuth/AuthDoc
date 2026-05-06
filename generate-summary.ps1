@@ -6,6 +6,38 @@ $docsRootResolved = (Resolve-Path $DocsRoot).Path.TrimEnd('\\')
 $summaryPath = Join-Path $docsRootResolved 'SUMMARY.md'
 $excludeDirs = @('node_modules', '_book', '.git')
 
+function Get-LinkLabel {
+    param(
+        [System.IO.FileInfo]$File
+    )
+
+    $defaultLabel = [IO.Path]::GetFileNameWithoutExtension($File.Name)
+    $firstLine = $null
+
+    try {
+        $reader = [System.IO.StreamReader]::new($File.FullName, [System.Text.UTF8Encoding]::new($false, $true))
+        try {
+            $firstLine = $reader.ReadLine()
+        }
+        finally {
+            $reader.Dispose()
+        }
+    }
+    catch {
+        # UTF-8として読めない場合は既定ラベルへフォールバック
+        return $defaultLabel
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($firstLine)) {
+        $trimmed = $firstLine.Trim()
+        if ($trimmed -match '^#+\s*(.+)$') {
+            return $matches[1].Trim()
+        }
+    }
+
+    return $defaultLabel
+}
+
 $mdFiles = Get-ChildItem -Path $docsRootResolved -Recurse -File -Filter '*.md' |
     Where-Object {
         $fullName = $_.FullName
@@ -32,7 +64,7 @@ foreach ($file in $mdFiles) {
     $relativePath = $relativePath -replace '\\', '/'
 
     $parts = $relativePath.Split('/')
-    $label = [IO.Path]::GetFileNameWithoutExtension($file.Name)
+    $label = Get-LinkLabel -File $file
 
     if ($parts.Length -eq 1) {
         $rootFiles += [PSCustomObject]@{ Label = $label; Path = $relativePath }

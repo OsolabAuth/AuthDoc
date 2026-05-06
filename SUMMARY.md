@@ -1,17 +1,23 @@
 ﻿# Summary
 
-* [README](README.md)
+* [Introduction](README.md)
 
 ## API
-* [signup](API/signup.md)
+* [認可エンドポイント](API/GetAuthorize.md)
+* [JWKsエンドポイント](API/GetTerm.md)
+* [OpenID Configurationエンドポイント](API/GetWellKnown.md)
+* [認証基盤ログイン](API/PostLogin.md)
+* [規約同意](API/PostTermConsent.md)
+* [トークンエンドポイント](API/PostToken.md)
+* [新規登録](API/signup.md)
 
 ## Architecture
-* [AuthorizationCodeFlow](Architecture/AuthorizationCodeFlow.md)
-* [ClientRegister](Architecture/ClientRegister.md)
+* [認証フロー](Architecture/AuthorizationCodeFlow.md)
+* [パブリッククライアント登録フロー](Architecture/ClientRegister.md)
 * [overview](Architecture/overview.md)
-* [paternA](Architecture/paternA.md)
-* [Signup](Architecture/Signup.md)
+* [ログアウトフロー](Architecture/SignOut.md)
+* [アカウント登録フロー](Architecture/Signup.md)
 
 ## Data
-* [Cookie](Data/Cookie.md)
-* [Redis](Data/Redis.md)
+* [認証基盤のCookie設計](Data/Cookie.md)
+* [Redisデータ設計](Data/Redis.md)

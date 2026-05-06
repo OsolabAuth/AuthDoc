@@ -1,4 +1,4 @@
-# Signup API
+# 新規登録
 
 ## ■ Endpoint
 POST /Signup/Account

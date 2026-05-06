@@ -1,7 +1,7 @@
 # 認可エンドポイント
 
 ## ■ Endpoint
-Get /Authorize
+Get /authorize
 
 ## ■ Header
 なし
