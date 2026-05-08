@@ -8,7 +8,7 @@ scope ごとに返却可能な claim を定義する。`/userinfo` や ID トー
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | sequence_id | Not Null | Primary | bigint(identity) | サロゲートキー |
 | scope | Not Null | Foreign | varchar(64) | 対象scope |
 | data_key | Not Null | Foreign | varchar(64) | 返却対象claim |
@@ -19,7 +19,7 @@ scope ごとに返却可能な claim を定義する。`/userinfo` や ID トー
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_scope_data_key | Primary Key | sequence_id | レコードを一意に識別する |
 | FK_scope_data_key_scope | Foreign Key | scope | `scope_master.scope` を参照する |
 | FK_scope_data_key_data_key | Foreign Key | data_key | `data_key_master.data_key` を参照する |

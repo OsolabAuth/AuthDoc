@@ -8,7 +8,7 @@
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | sequence_id | Not Null | Primary | bigint(identity) | サロゲートキー |
 | client_id | Not Null | Foreign | varchar(32) | クライアント識別子 |
 | redirect_uri | Not Null | - | nvarchar(2048) | 許可するリダイレクトURI |
@@ -20,7 +20,7 @@
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_client_redirect_uri | Primary Key | sequence_id | レコードを一意に識別する |
 | FK_client_redirect_uri_client_id | Foreign Key | client_id | `client_master.client_id` を参照する |
 | UQ_client_redirect_uri_client_id_redirect_uri | Unique | client_id, redirect_uri | 同一クライアントへの重複登録を防止する |
@@ -28,7 +28,7 @@
 ## インデックス
 
 | IndexName | Columns | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | IX_client_redirect_uri_client_id_status | client_id, status | クライアント単位の有効URI検索で使用する |
 | IX_client_redirect_uri_client_id_redirect_uri_status | client_id, redirect_uri, status | 認可時・トークン時の完全一致検証で使用する |
 

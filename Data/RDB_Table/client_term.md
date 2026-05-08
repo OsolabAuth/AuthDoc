@@ -8,7 +8,7 @@
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | sequence_id | Not Null | Primary | bigint(identity) | サロゲートキー |
 | client_id | Not Null | Foreign | varchar(32) | クライアント識別子 |
 | term_id | Not Null | Foreign | varchar(64) | 適用対象規約識別子 |
@@ -21,7 +21,7 @@
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_client_term | Primary Key | sequence_id | レコードを一意に識別する |
 | FK_client_term_client_id | Foreign Key | client_id | `client_master.client_id` を参照する |
 | FK_client_term_term_id | Foreign Key | term_id | `term_master.term_id` を参照する |

@@ -8,8 +8,8 @@ GET /userinfo
 ### ■ Header
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
-| Authorization | ○ | ^Bearer .+$ | アクセストークン |
+| :--- | :---: | :--- | :--- |
+| Authorization | ○ | ^Bearer [A-Fa-f0-9]{16}_[A-Fa-f0-9]{32}_[0-9]{32}$ | アクセストークン |
 
 ### ■ Query
 なし
@@ -25,13 +25,13 @@ GET /userinfo
 ### ■ Body
 
 | Name | Type | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | sub | String | ユーザー識別子 |
 | email | String | メールアドレス。`email` scope 付与時のみ |
 | name | String | 表示名。`profile` scope 付与時のみ |
 | picture | String | プロフィール画像URL。`profile` scope 付与時のみ |
 
 ## ■ 処理概要
-- Bearer アクセストークンを検証し、token_id に紐づくトークン情報を取得する
+- Bearer アクセストークンを検証し、`osolab_id_tokenid_client_id` 形式から token_id を抽出してトークン情報を取得する
 - scope に応じて返却可能なユーザー属性を抽出する
 - OpenID Connect UserInfo として返却する

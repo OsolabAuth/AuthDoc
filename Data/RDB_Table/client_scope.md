@@ -8,7 +8,7 @@
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | sequence_id | Not Null | Primary | bigint(identity) | サロゲートキー |
 | client_id | Not Null | Foreign | varchar(32) | クライアント識別子 |
 | scope | Not Null | Foreign | varchar(64) | 許可するscope |
@@ -20,7 +20,7 @@
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_client_scope | Primary Key | sequence_id | レコードを一意に識別する |
 | FK_client_scope_client_id | Foreign Key | client_id | `client_master.client_id` を参照する |
 | FK_client_scope_scope | Foreign Key | scope | `scope_master.scope` を参照する |
@@ -35,3 +35,4 @@
 
 - `required=1` の scope は認可時に自動付与または拒否不可の扱いを取れる。
 - `scope_master.confidential_only=1` の scope は `client_type=Public` のクライアントには登録不可とする。
+- `client_type=99` の InnerClient はフルアクセス前提のため、`client_scope` に明示登録しない運用、または全scopeを自動許可する運用のいずれかを採る。

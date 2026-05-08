@@ -8,7 +8,7 @@
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | osolab_id | Not Null | Primary | nvarchar(16) | ユーザー識別子 |
 | email | Not Null | - | varchar(255) | ログインIDとして利用するメールアドレス |
 | password | Not Null | - | varchar(128) | パスワードハッシュ値 |
@@ -20,19 +20,19 @@
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_osolab_user | Primary Key | osolab_id | ユーザーを一意に識別する |
 
 ## インデックス
 
 | IndexName | Columns | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | IX_osolab_user_email | email | メールアドレスによるユーザー検索で使用する |
 
 ## 参照関係
 
 | RelatedTable | Type | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | [user_info](./user_info.md) | Referenced | ユーザー属性を管理する子テーブル |
 
 ## API利用箇所

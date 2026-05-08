@@ -8,7 +8,7 @@ POST /token
 ### ■ Header
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
+| :--- | :---: | :--- | :--- |
 | x-flow-type | ○ | - | AuthorizationCode |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 | Authorization | - | ^Basic .+$ | Base64(クライアントID:クライアントシークレット) |
@@ -19,11 +19,11 @@ POST /token
 ### ■ Body
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
+| :--- | :---: | :--- | :--- |
 | grant_type | ○ | ^authorization_code$ | 認可コードフロー固定値 |
 | code | ○ | ^[A-Za-z0-9._~-]{20,}$ | 認可コード |
 | code_verifier | ○ | ^[A-Za-z0-9._~-]{43,128}$ | PKCE コードベリファイア |
-| redirect_uri | ○ | ^(https://.+|http://localhost(:[0-9]+)?(/.*)?)$ | 認可要求時と同一のリダイレクト先。通常は `https`、検証用途の `localhost` のみ `http` を許容 |
+| redirect_uri | ○ | ^(https://.+\|http://localhost(:[0-9]+)?(/.*)?)$ | 認可要求時と同一のリダイレクト先。通常は `https`、検証用途の `localhost` のみ `http` を許容 |
 
 ## Response
 
@@ -33,10 +33,12 @@ POST /token
 ### ■ Body
 
 | Name | Type | Description |
-|:---|:---|:---|
-| access_token | String | 発行したアクセストークン |
+| :--- | :--- | :--- |
+| access_token | String | 発行したアクセストークン。`osolab_id_tokenid_client_id` 形式 |
+| refresh_token | String | 発行したリフレッシュトークン。`osolab_id_tokenid_client_id` 形式 |
 | token_type | String | トークン種別。`Bearer` |
 | expires_in | Number | アクセストークン有効期限秒数 |
+| refresh_token_expires_in | Number | リフレッシュトークン有効期限秒数 |
 | scope | String | 発行したスコープの空白区切り文字列 |
 | id_token | String | 発行したIDトークン |
 

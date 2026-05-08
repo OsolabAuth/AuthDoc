@@ -21,7 +21,7 @@ GET /jwks
 ### ■ Body
 
 | Name | Type | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | keys | Array<Object> | 公開鍵一覧 |
 | keys[].kid | String | 鍵識別子 |
 | keys[].kty | String | 鍵種別。`RSA`固定 |

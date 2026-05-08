@@ -8,8 +8,8 @@ POST /login
 ### ■ Header
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
-| x-session-id | ○ | ^[A-Za-z0-9_-]{20,}$ | 認可セッションID |
+| :--- | :---: | :--- | :--- |
+| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
@@ -18,24 +18,24 @@ POST /login
 ### ■ Body
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
+| :--- | :---: | :--- | :--- |
 | email | ○ | ^.+@.+$ | ログイン対象メールアドレス |
-| password | ○ | ^.{8,128}$ | クライアント側でハッシュ化済みのパスワード |
+| password | ○ | ^[A-Fa-f0-9]{64}$ | SHA-256 の 16進文字列(64桁) |
 
 ## Response
 
 ### ■ Header
 
 | Name | Description |
-|:---|:---|
+| :--- | :--- |
 | Set-Cookie | AuthSessionIdを設定 |
 | Location | 認可完了時のリダイレクト先、または規約同意画面 |
 
 ### ■ Body
 
 | Name | Type | Description |
-|:---|:---|:---|
-| result | String | 処理結果。`redirect` または `error` |
+| :--- | :--- | :--- |
+| result | String | 処理結果。`redirect`、`logged_in`、`error` |
 | error_code | String | 認証失敗時のエラーコード |
 | message | String | 画面表示用メッセージ |
 
@@ -45,3 +45,4 @@ POST /login
 - 認証成功時は Auth Session を払い出し、Cookie に設定する
 - 規約・scope 同意済みなら認可コードを発行し `redirect_uri` へリダイレクトする
 - 未同意なら `GET /terms` へ遷移させる
+- セッションが存在しない場合は、Cookieをログイン状態にするが、リダイレクトせずにエラーコードを返却

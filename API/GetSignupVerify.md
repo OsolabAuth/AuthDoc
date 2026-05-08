@@ -11,7 +11,7 @@ GET /Signup/Verify
 ### ■ Query
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
+| :--- | :---: | :--- | :--- |
 | token | ○ | ^[A-Za-z0-9_-]{20,}$ | メール認証トークン |
 
 ### ■ Body
@@ -22,7 +22,7 @@ GET /Signup/Verify
 ### ■ Header
 
 | Name | Description |
-|:---|:---|
+| :--- | :--- |
 | Set-Cookie | AuthSessionIdを設定 |
 | Location | 認可完了時のリダイレクト先、または規約同意画面 |
 

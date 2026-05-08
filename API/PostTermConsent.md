@@ -8,8 +8,8 @@ POST /terms
 ### ■ Header
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
-| x-session-id | ○ | ^[A-Za-z0-9_-]{20,}$ | 認可セッションID |
+| :--- | :---: | :--- | :--- |
+| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
@@ -18,8 +18,8 @@ POST /terms
 ### ■ Body
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
-| accepted | ○ | ^(true|false|on)$ | 規約同意可否 |
+| :--- | :---: | :--- | :--- |
+| accepted | ○ | ^(true\|false\|on)$ | 規約同意可否 |
 | term_ids | ○ | - | 同意対象規約ID。複数時は同名項目を繰り返す |
 
 ## Response
@@ -27,13 +27,13 @@ POST /terms
 ### ■ Header
 
 | Name | Description |
-|:---|:---|
+| :--- | :--- |
 | Location | 認可コード付与後のリダイレクト先 |
 
 ### ■ Body
 
 | Name | Type | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | result | String | 処理結果。`redirect` |
 | error | String | 同意拒否時のエラーコード。`access_denied` |
 

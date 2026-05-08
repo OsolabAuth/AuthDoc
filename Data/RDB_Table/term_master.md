@@ -8,7 +8,7 @@
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | term_id | Not Null | Primary | varchar(64) | 規約識別子 |
 | term_type | Not Null | - | varchar(32) | 規約種別 |
 | title | Not Null | - | nvarchar(255) | 規約名 |
@@ -23,7 +23,7 @@
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_term_master | Primary Key | term_id | 規約識別子を一意に識別する |
 | UQ_term_master_term_type_version | Unique | term_type, version | 同種規約のバージョン重複を防止する |
 

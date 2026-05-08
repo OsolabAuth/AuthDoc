@@ -8,8 +8,8 @@ GET /terms
 ### ■ Header
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
-| x-session-id | ○ | ^[A-Za-z0-9_-]{20,}$ | 認可セッションID |
+| :--- | :---: | :--- | :--- |
+| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
 
 ### ■ Query
 なし
@@ -25,7 +25,7 @@ GET /terms
 ### ■ Body
 
 | Name | Type | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | client_id | String | 認可セッションに紐づくクライアント識別子 |
 | terms | Array<Object> | 同意対象の規約一覧 |
 | terms[].term_id | String | 規約識別子 |

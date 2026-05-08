@@ -8,7 +8,7 @@
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | data_key | Not Null | Primary | varchar(64) | 属性キー |
 | create_datetime | Not Null | - | datetime2(0) | レコード作成日時 |
 | update_datetime | Not Null | - | datetime2(0) | レコード更新日時 |
@@ -16,13 +16,13 @@
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_data_key_master | Primary Key | data_key | 属性キーを一意に識別する |
 
 ## 参照関係
 
 | RelatedTable | Type | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | [client_data_key](./client_data_key.md) | Referenced | クライアントごとの利用可能属性キー管理で参照される |
 
 ## 初期データ

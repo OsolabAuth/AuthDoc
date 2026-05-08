@@ -8,7 +8,7 @@
 ## テーブル構造
 
 | ColumnName | Null | Key | Type | Description |
-|:---|:---:|:---|:---|:---|
+| :--- | :---: | :--- | :--- | :--- |
 | sequence_id | Not Null | Primary | bigint(identity) | サロゲートキー |
 | osolab_id | Not Null | Foreign | nvarchar(16) | ユーザー識別子 |
 | client_id | Not Null | Foreign | varchar(32) | クライアント識別子 |
@@ -21,7 +21,7 @@
 ## 制約
 
 | ConstraintName | Type | Columns | Description |
-|:---|:---|:---|:---|
+| :--- | :--- | :--- | :--- |
 | PK_user_term_consent | Primary Key | sequence_id | レコードを一意に識別する |
 | FK_user_term_consent_osolab_id | Foreign Key | osolab_id | `osolab_user.osolab_id` を参照する |
 | FK_user_term_consent_client_id | Foreign Key | client_id | `client_master.client_id` を参照する |
@@ -30,7 +30,7 @@
 ## インデックス
 
 | IndexName | Columns | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | IX_user_term_consent_osolab_id_client_id_term_id_consented_datetime | osolab_id, client_id, term_id, consented_datetime | 最新同意状況の判定に使用する |
 
 ## API利用箇所

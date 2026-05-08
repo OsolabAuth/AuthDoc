@@ -5,7 +5,7 @@
 ### 実装済みテーブル
 
 | TableName | PhysicalName | Purpose |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | クライアントマスタ | [client_master](./RDB_Table/client_master.md) | 認証基盤を利用するクライアントアプリケーションを管理する |
 | ユーザーテーブル | [osolab_user](./RDB_Table/osolab_user.md) | 認証基盤のユーザーアカウントを管理する |
 | ユーザー属性テーブル | [user_info](./RDB_Table/user_info.md) | クライアントごとにユーザーへ紐づく属性値を管理する |
@@ -15,7 +15,7 @@
 ### 仕様実装に必要な追加テーブル
 
 | TableName | PhysicalName | Purpose |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | クライアントリダイレクトURI | [client_redirect_uri](./RDB_Table/client_redirect_uri.md) | クライアントごとに許可する `redirect_uri` を複数管理する |
 | Scope管理マスタ | [scope_master](./RDB_Table/scope_master.md) | OpenID Connect / OAuth2 の要求可能 scope を管理する |
 | クライアント許可Scope | [client_scope](./RDB_Table/client_scope.md) | クライアントごとに要求可能な scope を管理する |
@@ -28,7 +28,7 @@
 ## 仕様実装に対する不足整理
 
 | 対象 | 不足している内容 | 必要な対応 |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | 認可エンドポイント | `redirect_uri` の事前登録先がない | `client_redirect_uri` を追加し、`client_id` ごとに複数管理する |
 | トークンエンドポイント | 認可時と同一 `redirect_uri` の照合元がない | `client_redirect_uri` と認可コード保存値の両方で完全一致検証する |
 | 規約表示・同意 | 規約マスタ、クライアント別適用設定、同意履歴がない | `term_master`、`client_term`、`user_term_consent` を追加する |
@@ -41,7 +41,7 @@
 ## 既存テーブルの拡張ポイント
 
 | Table | 現状 | 追加推奨項目 |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | `client_master` | クライアント識別子・名称・シークレットのみ | `client_type`、`token_endpoint_auth_method`、`require_pkce` など |
 | `osolab_user` | ログイン用最小情報のみ | 表示名やプロフィール画像は `user_info` 運用でも可。必要ならメール検証日時の保持も検討 |
 | `user_info` | 属性値格納のみ | `data_key_master` へのFK追加、共通クライアント属性の扱い明文化 |

@@ -6,14 +6,14 @@ POST /Signup/Account
 ## ■ Header
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
+| :--- | :---: | :--- | :--- |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
-| x-session-id | ○ | ^[A-Za-z0-9_-]{20,}$ | 認可セッションID |
+| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
 
 ## ■ Request Body
 
 | Name | Required | Regex | Description |
-|:---|:---:|:---|:---|
+| :--- | :---: | :--- | :--- |
 | email | ○ | ^.+@.+$ | 登録対象メールアドレス |
 | password | ○ | ^.{8,128}$ | クライアント側でハッシュ化済みのパスワード |
 
@@ -25,7 +25,7 @@ POST /Signup/Account
 ### ■ Body
 
 | Name | Type | Description |
-|:---|:---|:---|
+| :--- | :--- | :--- |
 | result | String | 処理結果。`pending_verification` |
 | message | String | 画面表示用メッセージ |
 

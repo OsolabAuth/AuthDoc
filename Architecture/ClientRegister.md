@@ -3,12 +3,13 @@
 ## ■ フロー概要
 
 OAuth 2.1 準拠のクライアント登録フローを定義する。  
-`client_master.client_type = 0` を Public、`client_master.client_type = 1` を Confidential とし、登録時にいずれかを選択できる前提とする。
+`client_master.client_type = 0` を Public、`client_master.client_type = 1` を Confidential、`client_master.client_type = 99` を InnerClient とする。  
+本フローで登録可能なのは Public / Confidential のみとし、InnerClient は IdP 直轄の内部専用クライアントとしてSQL追加のみとする。
 
 ## ■ 登録対象
 
 | 項目 | 内容 |
-|:---|:---|
+| :--- | :--- |
 | client_master | クライアント本体。`client_type` を保持する |
 | client_redirect_uri | 認可後の戻り先URIを完全一致で登録する |
 | client_scope | クライアントが要求可能な scope を登録する |
@@ -40,7 +41,7 @@ ui -> auth : クライアント登録要求
 
 group 入力値検証
   auth -> auth : 必須項目チェック
-  auth -> auth : client_type値チェック
+  auth -> auth : client_type値チェック(Public/Confidentialのみ許可)
   auth -> auth : redirect_uri形式チェック
   auth -> rdb : SELECT scope_master
   note right
@@ -154,13 +155,17 @@ group 認可要求検証
   end note
   auth <-- rdb : redirect_uri一致結果
 
-  auth -> rdb : SELECT client_scope
-  note right
-    WHERE client_id = ?
-      AND scope IN 要求scope
-      AND status = 1
-  end note
-  auth <-- rdb : scope一致結果
+  alt client_type = InnerClient
+    auth -> auth : scope制限をスキップ
+  else
+    auth -> rdb : SELECT client_scope
+    note right
+      WHERE client_id = ?
+        AND scope IN 要求scope
+        AND status = 1
+    end note
+    auth <-- rdb : scope一致結果
+  end
 
   auth -> auth : PKCE必須チェック
 end
@@ -215,6 +220,7 @@ end
 
 - OAuth 2.1 前提として、Public / Confidential を問わず認可要求時の PKCE を必須とする。
 - `redirect_uri` は [client_redirect_uri](../Data/RDB_Table/client_redirect_uri.md) の完全一致で検証する。
-- `scope_master.confidential_only=1` の scope は Confidential Client のみ選択可能とし、登録画面と登録APIの両方で制御する。
+- `scope_master.confidential_only=1` の scope は Confidential Client と InnerClient のみ利用可能とし、通常の登録画面と登録APIでは Public への設定を禁止する。
 - Public Client は `client_secret` を利用しないため、登録時は空文字または未使用値を保存する。
 - Confidential Client は登録完了時に `client_secret` を払い出し、`POST /token` でクライアント認証を行う。
+- InnerClient は IdP 直轄の特権クライアントであり、通常の外部登録フローでは作成しない。
