@@ -14,7 +14,7 @@ GET /authorize
 |:---|:---:|:---|:---|
 | response_type | ○ | ^code$ | 認可コードフロー固定値 |
 | client_id | ○ | ^[A-Za-z0-9]{32}$ | クライアント識別子 |
-| redirect_uri | ○ | ^https://.+$ | 認可結果のリダイレクト先 |
+| redirect_uri | ○ | ^(https://.+|http://localhost(:[0-9]+)?(/.*)?)$ | 認可結果のリダイレクト先。通常は `https`、検証用途の `localhost` のみ `http` を許容 |
 | state | ○ | ^.{1,255}$ | CSRF対策用のクライアント状態値 |
 | scope | ○ | ^[A-Za-z0-9_ ]+$ | 要求するスコープの空白区切り文字列 |
 | code_challenge_method | ○ | ^S256$ | PKCE チャレンジ方式 |

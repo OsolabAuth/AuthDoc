@@ -23,7 +23,7 @@ POST /token
 | grant_type | ○ | ^authorization_code$ | 認可コードフロー固定値 |
 | code | ○ | ^[A-Za-z0-9._~-]{20,}$ | 認可コード |
 | code_verifier | ○ | ^[A-Za-z0-9._~-]{43,128}$ | PKCE コードベリファイア |
-| redirect_uri | ○ | ^https://.+$ | 認可要求時と同一のリダイレクト先 |
+| redirect_uri | ○ | ^(https://.+|http://localhost(:[0-9]+)?(/.*)?)$ | 認可要求時と同一のリダイレクト先。通常は `https`、検証用途の `localhost` のみ `http` を許容 |
 
 ## Response
 
