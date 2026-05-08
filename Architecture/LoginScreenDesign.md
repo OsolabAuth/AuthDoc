@@ -18,26 +18,46 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 
 ## ■ ワイヤーフレーム
 
-```plantuml
-@startuml
-skinparam defaultTextAlignment center
-skinparam rectangle {
-  RoundCorner 12
-}
+<div style="max-width: 520px; margin: 24px auto; padding: 32px; border: 1px solid #d7dce2; border-radius: 18px; background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%); box-shadow: 0 14px 40px rgba(24, 39, 75, 0.08); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+  <div style="display: inline-block; padding: 4px 10px; margin-bottom: 16px; border-radius: 999px; background: #e9f2ff; color: #2457a6; font-size: 12px; font-weight: 700;">SCR-LOGIN-01</div>
+  <div style="margin-bottom: 8px; color: #111827; font-size: 28px; font-weight: 700;">LBL01: 認証基盤ログイン</div>
+  <div style="margin-bottom: 20px; color: #4b5563; font-size: 14px; line-height: 1.6;">
+    MSG01: クライアント名へのアクセスを続行するにはログインしてください
+  </div>
+  <div style="margin-bottom: 18px; padding: 10px 12px; border: 1px dashed #b8c1cc; border-radius: 10px; background: #f8fafc; color: #6b7280; font-size: 13px;">
+    HDN01: hidden session_id
+  </div>
+  <div style="margin-bottom: 16px;">
+    <div style="margin-bottom: 6px; color: #334155; font-size: 13px; font-weight: 600;">TXT01: メールアドレス</div>
+    <div style="padding: 14px 16px; border: 1px solid #cbd5e1; border-radius: 10px; background: #ffffff; color: #94a3b8;">sample@example.com</div>
+  </div>
+  <div style="margin-bottom: 16px;">
+    <div style="margin-bottom: 6px; color: #334155; font-size: 13px; font-weight: 600;">TXT02: パスワード</div>
+    <div style="padding: 14px 16px; border: 1px solid #cbd5e1; border-radius: 10px; background: #ffffff; color: #94a3b8;">••••••••••••</div>
+  </div>
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 18px; color: #475569; font-size: 13px;">
+    <div style="width: 16px; height: 16px; border: 1px solid #94a3b8; border-radius: 4px; background: #ffffff;"></div>
+    <div>CHK01: ログイン状態を保持する</div>
+  </div>
+  <div style="margin-bottom: 14px; padding: 12px 14px; border: 1px solid #f1b7b7; border-radius: 10px; background: #fff4f4; color: #b42318; font-size: 13px;">
+    MSG02: 入力/認証エラー表示領域
+  </div>
+  <div style="margin-bottom: 16px; text-align: center;">
+    <div style="display: inline-block; min-width: 220px; padding: 14px 24px; border-radius: 10px; background: #1d4ed8; color: #ffffff; font-weight: 700;">
+      BTN01: ログイン
+    </div>
+  </div>
+  <div style="text-align: center; color: #2563eb; font-size: 14px; font-weight: 600;">
+    LNK01: 新規登録
+  </div>
+</div>
 
-rectangle "SCR-LOGIN-01 認証画面" {
-  rectangle "LBL01: タイトル\n認証基盤ログイン" as LBL01
-  rectangle "MSG01: 説明文\nクライアント名へのアクセスを続行するにはログインしてください" as MSG01
-  rectangle "HDN01: hidden session_id" as HDN01
-  rectangle "TXT01: メールアドレス入力" as TXT01
-  rectangle "TXT02: パスワード入力" as TXT02
-  rectangle "CHK01: ログイン状態を保持する\n任意" as CHK01
-  rectangle "BTN01: ログイン" as BTN01
-  rectangle "LNK01: 新規登録" as LNK01
-  rectangle "MSG02: 入力/認証エラー表示領域" as MSG02
-}
-@enduml
-```
+| レイアウトメモ | 内容 |
+|:---|:---|
+| 画面構成 | 単一カラムのセンターボックス |
+| 主ボタン | 入力欄の直下に 1 つ配置 |
+| エラー表示 | ボタン上部にまとめて表示 |
+| 導線 | 新規登録は主操作の下に補助リンクとして配置 |
 
 ## ■ 要素一覧
 
