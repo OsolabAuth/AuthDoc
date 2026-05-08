@@ -17,6 +17,14 @@ GET /Signup/Verify
 ### ■ Body
 なし
 
+### ■ ResponseCode
+
+| Code | HttpStatusCode | Description |
+| :--- | :--- | :--- |
+| 00001 | 400 | リクエストの内容が異常です |
+| 00003 | 400 | 画面の有効期限が切れました。再度ログインをやり直してください。 |
+| 90000 | 500 | ハンドルされていないエラーが発生しました |
+
 ## Response
 
 ### ■ Header

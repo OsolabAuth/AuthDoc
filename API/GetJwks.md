@@ -29,3 +29,10 @@ GET /jwks
 | keys[].use | String | 鍵用途。`sig`固定 |
 | keys[].n | String | RSA公開鍵の modulus |
 | keys[].e | String | RSA公開鍵の exponent |
+
+### ■ ResponseCode
+
+| Code | HttpStatusCode | Description |
+| :--- | :--- | :--- |
+| 00000 | 200 | OK |
+| 90000 | 500 | ハンドルされていないエラーが発生しました |

@@ -15,7 +15,7 @@ POST /Signup/Account
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
 | email | ○ | ^.+@.+$ | 登録対象メールアドレス |
-| password | ○ | ^.{8,128}$ | クライアント側でハッシュ化済みのパスワード |
+| password | ○ | ^[A-Fa-f0-9]{64}$ | SHA-256 の 16進文字列(64桁) |
 
 ## Response
 
@@ -28,6 +28,16 @@ POST /Signup/Account
 | :--- | :--- | :--- |
 | result | String | 処理結果。`pending_verification` |
 | message | String | 画面表示用メッセージ |
+
+### ■ ResponseCode
+
+| Code | HttpStatusCode | Description |
+| :--- | :--- | :--- |
+| 00000 | 200 | OK |
+| 00001 | 400 | リクエストの内容が異常です |
+| 00003 | 400 | 画面の有効期限が切れました。再度ログインをやり直してください。 |
+| 90000 | 500 | ハンドルされていないエラーが発生しました |
+| 90001 | 500 | ID生成に失敗しました |
 
 ## ■ 処理概要
 - 認可セッションを取得し、対象クライアントを特定する

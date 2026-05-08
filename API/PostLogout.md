@@ -36,6 +36,14 @@ POST /Logout
 | :--- | :--- | :--- |
 | result | String | 処理結果。`logged_out` または `already_logged_out` |
 
+### ■ ResponseCode
+
+| Code | HttpStatusCode | Description |
+| :--- | :--- | :--- |
+| 00000 | 200 | OK |
+| 00001 | 400 | リクエストの内容が異常です |
+| 90000 | 500 | ハンドルされていないエラーが発生しました |
+
 ## ■ 処理概要
 - Cookie から Auth Session を取得し、存在する場合は削除する
 - 指定がある場合は Bearer アクセストークンを失効させる

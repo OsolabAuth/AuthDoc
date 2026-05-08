@@ -37,6 +37,14 @@ POST /terms
 | result | String | 処理結果。`redirect` |
 | error | String | 同意拒否時のエラーコード。`access_denied` |
 
+### ■ ResponseCode
+
+| Code | HttpStatusCode | Description |
+| :--- | :--- | :--- |
+| 00001 | 400 | リクエストの内容が異常です |
+| 00003 | 400 | 画面の有効期限が切れました。再度ログインをやり直してください。 |
+| 90000 | 500 | ハンドルされていないエラーが発生しました |
+
 ## ■ 処理概要
 - `x-session-id` から認可セッションを取得する
 - 最新規約に対する同意情報を登録する
