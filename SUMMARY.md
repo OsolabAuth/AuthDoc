@@ -19,6 +19,7 @@
 
 ## Architecture
 * [認証フロー](Architecture/AuthorizationCodeFlow.md)
+* [認証画面設計](Architecture/LoginScreenDesign.md)
 * [パブリッククライアント登録フロー](Architecture/ClientRegister.md)
 * [overview](Architecture/overview.md)
 * [ログアウトフロー](Architecture/SignOut.md)
