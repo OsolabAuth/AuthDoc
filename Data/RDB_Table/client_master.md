@@ -12,6 +12,7 @@
 | client_id | Not Null | Primary | varchar(32) | クライアント識別子 |
 | client_name | Not Null | - | nvarchar(64) | クライアント表示名 |
 | client_secret | Not Null | - | varchar(64) | クライアントシークレット |
+| client_type | Not Null | - | tinyint | 0:Public,1:Confidential  |
 | create_datetime | Not Null | - | datetime2(0) | レコード作成日時 |
 | update_datetime | Not Null | - | datetime2(0) | レコード更新日時 |
 | status | Not Null | - | tinyint | 状態 0:無効,1:有効 |

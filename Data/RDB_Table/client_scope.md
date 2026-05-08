@@ -34,3 +34,4 @@
 ## 補足
 
 - `required=1` の scope は認可時に自動付与または拒否不可の扱いを取れる。
+- `scope_master.confidential_only=1` の scope は `client_type=Public` のクライアントには登録不可とする。
