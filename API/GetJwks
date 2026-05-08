@@ -20,19 +20,12 @@ GET /jwks
 
 ### ■ Body
 
-#### ■ サンプル
-
-```json
-{
-  "keys": [
-    {
-        "kid":"",
-        "kty":"",
-        "alg":"",
-        "use":"",
-        "n":"",
-        "e":""
-    }
-  ]
-}
-```
+| Name | Type | Description |
+|:---|:---|:---|
+| keys | Array<Object> | 公開鍵一覧 |
+| keys[].kid | String | 鍵識別子 |
+| keys[].kty | String | 鍵種別。`RSA` |
+| keys[].alg | String | 署名アルゴリズム。`RS256` |
+| keys[].use | String | 鍵用途。`sig` |
+| keys[].n | String | RSA公開鍵の modulus |
+| keys[].e | String | RSA公開鍵の exponent |

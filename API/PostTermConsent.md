@@ -1,38 +1,44 @@
 # 規約同意
 
 ## ■ Endpoint
-GET /jwks
+POST /terms
 
 ## Request
 
 ### ■ Header
-なし
+
+| Name | Required | Regex | Description |
+|:---|:---:|:---|:---|
+| x-session-id | ○ | ^[A-Za-z0-9_-]{20,}$ | 認可セッションID |
+| Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
 なし
 
 ### ■ Body
-なし
+
+| Name | Required | Regex | Description |
+|:---|:---:|:---|:---|
+| accepted | ○ | ^(true|false|on)$ | 規約同意可否 |
+| term_ids | ○ | - | 同意対象規約ID。複数時は同名項目を繰り返す |
 
 ## Response
+
 ### ■ Header
-なし
+
+| Name | Description |
+|:---|:---|
+| Location | 認可コード付与後のリダイレクト先 |
 
 ### ■ Body
 
-#### ■ サンプル
+| Name | Type | Description |
+|:---|:---|:---|
+| result | String | 処理結果。`redirect` |
+| error | String | 同意拒否時のエラーコード。`access_denied` |
 
-```json
-{
-  "keys": [
-    {
-        "kid":"",
-        "kty":"",
-        "alg":"",
-        "use":"",
-        "n":"",
-        "e":""
-    }
-  ]
-}
-```
+## ■ 処理概要
+- `x-session-id` から認可セッションを取得する
+- 最新規約に対する同意情報を登録する
+- 同意済みの場合は認可コードを発行し、`redirect_uri` に `code` と `state` を付与してリダイレクトする
+- 拒否時は `error=access_denied` を付与してリダイレクトする

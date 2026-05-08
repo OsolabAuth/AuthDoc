@@ -1,38 +1,47 @@
 # 認証基盤ログイン
 
 ## ■ Endpoint
-GET /jwks
+POST /login
 
 ## Request
 
 ### ■ Header
-なし
+
+| Name | Required | Regex | Description |
+|:---|:---:|:---|:---|
+| x-session-id | ○ | ^[A-Za-z0-9_-]{20,}$ | 認可セッションID |
+| Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
 なし
 
 ### ■ Body
-なし
+
+| Name | Required | Regex | Description |
+|:---|:---:|:---|:---|
+| email | ○ | ^.+@.+$ | ログイン対象メールアドレス |
+| password | ○ | ^.{8,128}$ | クライアント側でハッシュ化済みのパスワード |
 
 ## Response
+
 ### ■ Header
-なし
+
+| Name | Description |
+|:---|:---|
+| Set-Cookie | AuthSessionIdを設定 |
+| Location | 認可完了時のリダイレクト先、または規約同意画面 |
 
 ### ■ Body
 
-#### ■ サンプル
+| Name | Type | Description |
+|:---|:---|:---|
+| result | String | 処理結果。`redirect` または `error` |
+| error_code | String | 認証失敗時のエラーコード |
+| message | String | 画面表示用メッセージ |
 
-```json
-{
-  "keys": [
-    {
-        "kid":"",
-        "kty":"",
-        "alg":"",
-        "use":"",
-        "n":"",
-        "e":""
-    }
-  ]
-}
-```
+## ■ 処理概要
+- `x-session-id` を用いて認可セッションを取得する
+- メールアドレスで有効なユーザーを検索し、パスワードを検証する
+- 認証成功時は Auth Session を払い出し、Cookie に設定する
+- 規約・scope 同意済みなら認可コードを発行し `redirect_uri` へリダイレクトする
+- 未同意なら `GET /terms` へ遷移させる
