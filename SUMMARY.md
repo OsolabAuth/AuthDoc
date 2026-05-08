@@ -5,7 +5,7 @@
 ## API
 * [認可エンドポイント](API/GetAuthorize.md)
 * [ログイン画面表示](API/GetLogin.md)
-* [JWKsエンドポイント](API/GetJwks)
+* [JWKsエンドポイント](API/GetJwks.md)
 * [OpenID Configurationエンドポイント](API/GetWellKnown.md)
 * [UserInfoエンドポイント](API/GetUserinfo.md)
 * [規約取得](API/GetTerm.md)
