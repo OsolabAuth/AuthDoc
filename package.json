@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "honkit serve",
-    "build": "honkit build"
+    "build": "honkit build",
+    "summary": "node generate-summary.js"
   },
   "devDependencies": {
     "honkit": "^6.0.0",
