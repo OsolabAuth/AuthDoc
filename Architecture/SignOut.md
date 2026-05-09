@@ -21,11 +21,9 @@ group ログアウトエンドポイント
         Header
             Cookie.session_id : ログインセッションID
             Authorization: Bearer アクセストークン(任意)
-            Content-Type : application/json
+            Content-Type : application/x-www-form-urlencoded
         Body
-        {
-            "logout_all": false
-        }
+            logout_all=false
     end note
 
     auth -> auth : CookieからセッションIDを取得

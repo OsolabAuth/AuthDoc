@@ -1,7 +1,7 @@
 # メール認証
 
 ## ■ Endpoint
-GET /Signup/Verify
+GET /signup/verify
 
 ## Request
 
@@ -17,14 +17,6 @@ GET /Signup/Verify
 ### ■ Body
 なし
 
-### ■ ResponseCode
-
-| Code | HttpStatusCode | Description |
-| :--- | :--- | :--- |
-| 00001 | 400 | リクエストの内容が異常です |
-| 00003 | 400 | 画面の有効期限が切れました。再度ログインをやり直してください。 |
-| 90000 | 500 | ハンドルされていないエラーが発生しました |
-
 ## Response
 
 ### ■ Header
@@ -36,6 +28,14 @@ GET /Signup/Verify
 
 ### ■ Body
 なし
+
+### ■ ResponseCode
+
+| Code | HttpStatusCode | Description |
+| :--- | :--- | :--- |
+| 00001 | 400 | リクエストの内容が異常です |
+| 00003 | 400 | 画面の有効期限が切れました。再度ログインをやり直してください。 |
+| 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
 - メール認証トークンから仮登録ユーザーと認可セッションを取得する

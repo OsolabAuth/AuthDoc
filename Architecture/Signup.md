@@ -16,7 +16,7 @@ participant "MailProvider" as mail
 
 User -> Client : ログイン開始
 group 認可エンドポイント
-    Client -> auth : GET(/Authorize)
+    Client -> auth : GET(/authorize)
     note right
         Header
         Query
@@ -57,16 +57,14 @@ group アカウント登録
     User <- auth : アカウント登録画面
 
     User -> User : email/passwordを入力(ハッシュ化)
-    User -> auth : POST(/Signup/Account)
+    User -> auth : POST(/signup/account)
     note right
         Header
             x-session-id : 認可セッションID
-            Content-Type : application/json
+            Content-Type : application/x-www-form-urlencoded
         Body
-        {
-            "email": email
-            "password": passwordハッシュ
-        }
+            email=email
+            password=passwordハッシュ
     end note
 
     group 認可セッション取得
@@ -129,7 +127,7 @@ group アカウント登録
             To
                 email
             Body
-                /Signup/Verify?token=verification_token
+                /signup/verify?token=verification_token
         end note
         auth <-- mail
 
@@ -138,7 +136,7 @@ group アカウント登録
 end
 
 group メール認証
-    User -> auth : GET(/Signup/Verify)
+    User -> auth : GET(/signup/verify)
     note right
         Query
             token: verification_token

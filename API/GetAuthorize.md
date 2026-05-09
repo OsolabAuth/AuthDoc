@@ -13,7 +13,7 @@ GET /authorize
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
 | response_type | ○ | ^code$ | 認可コードフロー固定値 |
-| client_id | ○ | ^[A-Za-z0-9]{32}$ | クライアント識別子 |
+| client_id | ○ | ^[0-9]{32}$ | クライアント識別子 |
 | redirect_uri | ○ | ^(https://.+\|http://localhost(:[0-9]+)?(/.*)?)$ | 認可結果のリダイレクト先。通常は `https`、検証用途の `localhost` のみ `http` を許容 |
 | state | ○ | ^.{1,255}$ | CSRF対策用のクライアント状態値 |
 | scope | ○ | ^[A-Za-z0-9_ ]+$ | 要求するスコープの空白区切り文字列 |
@@ -28,21 +28,21 @@ GET /authorize
 
 ### ■ Header
 
-| Name     | Description　　　　　　　　　　　　　　　　　 |
-| :---------| :----------------------------------------------|
-| Location | ログイン画面、同意画面、または `redirect_uri` |
+| Name | Description |
+| :--- | :--- |
+| Location | リダイレクトレスポンス時のみ。ログイン画面、同意画面、または `redirect_uri` |
 
 ### ■ Body
 | Name | Type | Description |
 | :--- | :--- | :--- |
-| code | String | エラーの場合、レスポンスコード |
+| response_code | String | 非リダイレクトエラー時のみ必須。レスポンスコード |
 
 ### ■ ResponseCode
 
-| Code | HttpStatuCode | Description |
+| Code | HttpStatusCode | Description |
 | :--- | :--- | :--- |
-| 00001 | 400 | リクエストパラメータが異常 |
-| 00002 | 400 | 不正なクライアントIDを指定 |
+| 00001 | 400/302 | リクエストの内容が異常です。`redirect_uri` が検証済みで利用可能な場合は 302、そうでない場合は 400 |
+| 00002 | 400 | 不正なクライアント。`client_id` が未登録または無効 |
 | 00005 | 400 | リダイレクトURIが不正 |
 
 
@@ -52,3 +52,6 @@ GET /authorize
 - 未ログイン時は認可セッションを発行しクエリに付与して `GET /login` に遷移させる
 - 同意済みなら認可コードを発行して `redirect_uri` へリダイレクトする
 - 未同意なら `GET /terms` に遷移させる
+- `client_id` と `redirect_uri` が有効で、その後の検証で失敗した場合は `redirect_uri` のQueryに `response_code` を付与してリダイレクトする
+- `client_id` が未登録または無効な場合はリダイレクトせず、JSON Body付きで400Errorを返却する
+- `redirect_uri` の形式が不正、またはクライアントに未登録の場合はリダイレクトせず、JSON Body付きで400Errorを返却する

@@ -15,7 +15,7 @@ database mdb
 
 User -> Client : ログイン開始
 group 認可エンドポイント
-    Client -> auth : GET(/Authrize)
+    Client -> auth : GET(/authorize)
     note right
         Header
         Query
@@ -42,7 +42,7 @@ group 認可エンドポイント
     alt ログイン済みの場合
         group 規約、scopeへの同意チェック
             note over auth,rdb
-                RDBにclietn_terms と user_terms, client_scopes, user_client_scopesを追加して
+                RDBにclient_terms と user_terms, client_scopes, user_client_scopesを追加して
                 すべての規約、スコープに同意していることを確認する処理を追加
             end note 
         end
@@ -103,12 +103,10 @@ group 認可エンドポイント
         note right
             Header
                 x-session-id : 認可セッションID
-                Content-Type : application/json
+                Content-Type : application/x-www-form-urlencoded
             Body
-            {
-                "email": email
-                "password": passwordハッシュ
-            }
+                email=email
+                password=passwordハッシュ
         end note
         auth -> rdb : ユーザー取得
         auth <-- rdb : osolab_user
@@ -165,22 +163,22 @@ group 認可エンドポイント
         
     end
     group 規約同意
-        User -> auth : GET(/term)
+        User -> auth : GET(/terms)
         note right
             Header
             Query
                 client_id:クライアントID
         end note
         note over auth,rdb
-            RDBにclietn_terms と client_scopesを取得する処理
+            RDBにclient_terms と client_scopesを取得する処理
         end note 
         User <- auth : 規約画面
         User -> User : 同意操作
-        User -> auth : POST (/term)
+        User -> auth : POST(/terms)
         note right
             Header
                 x-session-id : 認可セッションID
-                Content-Type : application/json
+                Content-Type : application/x-www-form-urlencoded
         end note
         group 認可セッション取得
             auth -> mdb : Get:DB6 
@@ -204,18 +202,16 @@ group 認可エンドポイント
 
 end
 group トークンエンドポイント
-    Client -> auth : Post(/token)
+    Client -> auth : POST(/token)
     note right
         Header
             x-flow-type: AuthorizationCode
-            Content-Type : application/json
-            Authorizatioon : Basic Base64(クライアントID:クライアントシークレット)
+            Content-Type : application/x-www-form-urlencoded
+            Authorization : Basic Base64(クライアントID:クライアントシークレット)
         Body
-        {
-            "grant_type": authorization_code
-            "code_verifier": code_verifier
-            "code" : 認可コード
-        }
+            grant_type=authorization_code
+            code_verifier=code_verifier
+            code=認可コード
     end note
     auth -> mdb : 認可コード取得
     note right 
@@ -239,7 +235,7 @@ group トークンエンドポイント
 end
 
 group user_infoエンドポイント
-    Client -> auth : Get(api/auth/userinfo)
+    Client -> auth : GET(/userinfo)
     note right
         Header
             Authorization: Bearer アクセストークン
@@ -270,4 +266,4 @@ end
 
 ## ■ 補足
 - stateでCSRF対策
-- PKCE対応予定
+- PKCE必須

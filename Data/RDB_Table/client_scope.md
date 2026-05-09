@@ -35,4 +35,4 @@
 
 - `required=1` の scope は認可時に自動付与または拒否不可の扱いを取れる。
 - `scope_master.confidential_only=1` の scope は `client_type=Public` のクライアントには登録不可とする。
-- `client_type=99` の InnerClient はフルアクセス前提のため、`client_scope` に明示登録しない運用、または全scopeを自動許可する運用のいずれかを採る。
+- `client_type=99` の InnerClient はフルアクセス前提のため、`client_scope` に明示登録せず、有効な全scopeを利用可能とする。

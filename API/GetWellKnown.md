@@ -50,6 +50,7 @@ GET /.well-known/openid-configuration
     "iat",
     "picture"
   ],
-  "service_documentation": "https://osolab.jp/document/auth"
+  "service_documentation": "https://osolab.jp/document/auth",
+  "code_challenge_methods_supported": ["S256"]
 }
 ```

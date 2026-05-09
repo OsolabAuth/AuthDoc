@@ -1,7 +1,7 @@
 # ログアウト
 
 ## ■ Endpoint
-POST /Logout
+POST /logout
 
 ## Request
 
