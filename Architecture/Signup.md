@@ -53,7 +53,7 @@ group 認可エンドポイント
 end
 
 group アカウント登録
-    User -> auth : GET(/signup)
+    User -> auth : GET(/Signup/Account/view)
     User <- auth : アカウント登録画面
 
     User -> User : email/passwordを入力(ハッシュ化)
@@ -131,12 +131,12 @@ group アカウント登録
         end note
         auth <-- mail
 
-        User <- auth : メール確認待ち画面
+        User <- auth : verifyUrlを返却
     end
 end
 
 group メール認証
-    User -> auth : GET(/signup/verify)
+    User -> auth : GET(/Signup/Verify)
     note right
         Query
             token: verification_token
@@ -221,9 +221,10 @@ group メール認証
             auth <-- mdb
         end
 
-        Client <- auth : 認可コードを付与してリダイレクトURLにリダイレクト依頼
+        User <- auth : /authorize へリダイレクト
+        Client <- auth : 認可コードを付与してredirect_uriへリダイレクト依頼
     else
-        User <- auth : 同意画面にリダイレクト依頼
+        User <- auth : /terms/view にリダイレクト依頼
     end
 end
 
