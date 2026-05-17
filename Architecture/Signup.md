@@ -49,7 +49,11 @@ group 認可エンドポイント
         auth <-- mdb
     end
 
-    User <- auth : ログイン画面にリダイレクト依頼(認可セッションID)
+    User <- auth : ログイン画面に遷移依頼
+    note right
+        Portal UI方式ではsession_idをURL queryに付与しない。
+        /authorizeのレスポンスBodyで返却し、Portal UIがlocalStorageに保持する。
+    end note
 end
 
 group アカウント登録
@@ -60,9 +64,9 @@ group アカウント登録
     User -> auth : POST(/signup/account)
     note right
         Header
-            x-session-id : 認可セッションID
             Content-Type : application/x-www-form-urlencoded
         Body
+            session_id=認可セッションID
             email=email
             password=passwordハッシュ
     end note
@@ -70,7 +74,7 @@ group アカウント登録
     group 認可セッション取得
         auth -> mdb : Get:DB6
         note right
-            key: x-session-id
+            key: Body.session_id
         end note
         auth <-- mdb : 認可セッション情報
     end

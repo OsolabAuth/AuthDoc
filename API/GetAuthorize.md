@@ -6,7 +6,13 @@ GET /authorize
 ## Request
 
 ### ■ Header
-なし
+通常リダイレクト方式ではなし。
+
+Portal UI から呼び出す場合は次を指定する。
+
+| Name | Required | Regex | Description |
+| :--- | :---: | :--- | :--- |
+| x-auth-ui-session-mode | - | ^body$ | 認可セッションIDをURL queryに出さず、レスポンスBodyで返す |
 
 ### ■ Query
 
@@ -36,6 +42,10 @@ GET /authorize
 | Name | Type | Description |
 | :--- | :--- | :--- |
 | response_code | String | 非リダイレクトエラー時のみ必須。レスポンスコード |
+| result | String | `x-auth-ui-session-mode: body` 指定時のみ。`redirect` または `error` |
+| redirect_url | String | `x-auth-ui-session-mode: body` 指定時のみ。ログイン画面または同意画面のURL。`session_id` queryは含めない |
+| session_id | String | `x-auth-ui-session-mode: body` 指定時のみ。認可セッションID |
+| message | String | `x-auth-ui-session-mode: body` 指定時のみ。画面表示用メッセージ |
 
 ### ■ ResponseCode
 
@@ -49,9 +59,10 @@ GET /authorize
 ## ■ 処理概要
 - 認可リクエストを検証する
 - Auth Session が有効なら規約・scope 同意状態を確認する
-- 未ログイン時は認可セッションを発行しクエリに付与して `GET /login` に遷移させる
+- 未ログイン時は認可セッションを発行し、通常リダイレクト方式ではクエリに付与して `GET /login` に遷移させる
+- Portal UI 方式では `session_id` をレスポンスBodyで返し、`redirect_url` には `session_id` を付与しない。Portal UI は `session_id` を `localStorage` に保持する
 - 同意済みなら認可コードを発行して `redirect_uri` へリダイレクトする
-- 未同意なら `GET /terms` に遷移させる
+- 未同意なら規約同意画面に遷移させる
 - `client_id` と `redirect_uri` が有効で、その後の検証で失敗した場合は `redirect_uri` のQueryに `response_code` を付与してリダイレクトする
 - `client_id` が未登録または無効な場合はリダイレクトせず、JSON Body付きで400Errorを返却する
 - `redirect_uri` の形式が不正、またはクライアントに未登録の場合はリダイレクトせず、JSON Body付きで400Errorを返却する

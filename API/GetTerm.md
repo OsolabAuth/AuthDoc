@@ -1,7 +1,7 @@
 # 規約取得
 
 ## ■ Endpoint
-GET /terms
+POST /terms/list
 
 ## Request
 
@@ -9,13 +9,16 @@ GET /terms
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
+| Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
 なし
 
 ### ■ Body
-なし
+
+| Name | Required | Regex | Description |
+| :--- | :---: | :--- | :--- |
+| session_id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID。Portal UI では `localStorage` から取得してBodyに設定する |
 
 ## Response
 
@@ -44,6 +47,6 @@ GET /terms
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- `x-session-id` から認可セッションを取得する
+- Body の `session_id` から認可セッションを取得する
 - 認可セッションに紐づくクライアントの最新規約と要求 scope を取得する
 - 同意画面の描画に必要なデータを返却する

@@ -92,7 +92,11 @@ group 認可エンドポイント
                 「認可セッション発行」参照
             end note
         end
-        User <- auth : ログイン画面にリダイレクト依頼(認可セッションID)
+        User <- auth : ログイン画面に遷移依頼
+        note right
+            Portal UI方式ではsession_idをURL queryに付与しない。
+            /authorizeのレスポンスBodyで返却し、Portal UIがlocalStorageに保持する。
+        end note
     end
 
     group ログイン
@@ -102,9 +106,9 @@ group 認可エンドポイント
         User -> auth : POST(/login)
         note right
             Header
-                x-session-id : 認可セッションID
                 Content-Type : application/x-www-form-urlencoded
             Body
+                session_id=認可セッションID
                 email=email
                 password=passwordハッシュ
         end note
@@ -134,7 +138,7 @@ group 認可エンドポイント
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: x-session-id
+                key: Body.session_id
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -163,11 +167,12 @@ group 認可エンドポイント
         
     end
     group 規約同意
-        User -> auth : GET(/terms)
+        User -> auth : POST(/terms/list)
         note right
             Header
-            Query
-                client_id:クライアントID
+                Content-Type : application/x-www-form-urlencoded
+            Body
+                session_id=認可セッションID
         end note
         note over auth,rdb
             RDBにclient_terms と client_scopesを取得する処理
@@ -177,13 +182,16 @@ group 認可エンドポイント
         User -> auth : POST(/terms)
         note right
             Header
-                x-session-id : 認可セッションID
                 Content-Type : application/x-www-form-urlencoded
+            Body
+                session_id=認可セッションID
+                accepted=true/false
+                term_ids=規約ID
         end note
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: x-session-id
+                key: Body.session_id
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -232,6 +240,9 @@ group トークンエンドポイント
     auth -> auth : access_token発行
     auth -> auth : id_token発行
     Client <- auth : access_token, id_token, token_type
+    note left
+        Portal UIはaccess_token/id_token等をlocalStorageに保存する。
+    end note
 end
 
 group user_infoエンドポイント
@@ -254,6 +265,9 @@ group user_infoエンドポイント
             data_key in scope
     end note
     Client <- auth : アクセストークンのscopeに紐づく会員情報
+    note left
+        Portal UIはUserInfo応答をlocalStorageに保存する。
+    end note
 end
 @enduml
 ```
