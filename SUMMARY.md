@@ -19,9 +19,12 @@
 
 ## Architecture
 * [認証フロー](Architecture/AuthorizationCodeFlow.md)
-* [認証画面設計](Architecture/LoginScreenDesign.md)
 * [クライアント登録フロー](Architecture/ClientRegister.md)
 * [クライアント登録画面設計](Architecture/ClientRegisterScreenDesign.md)
+* [Docs Portal アクセス制御構成](Architecture/DocsPortalAccessControl.md)
+* [GCP デプロイ構成](Architecture/GcpDeployment.md)
+* [認証画面設計](Architecture/LoginScreenDesign.md)
+* [OIDC クライアント構成](Architecture/OidcClientDeployment.md)
 * [overview](Architecture/overview.md)
 * [ログアウトフロー](Architecture/SignOut.md)
 * [アカウント登録フロー](Architecture/Signup.md)
