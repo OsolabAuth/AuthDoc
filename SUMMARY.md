@@ -41,7 +41,6 @@
 * [ユーザーテーブル](Data/RDB_Table/osolab_user.md)
 * [Scope-Claimマッピング](Data/RDB_Table/scope_data_key.md)
 * [Scope管理マスタ](Data/RDB_Table/scope_master.md)
-* [規約マスタ](Data/RDB_Table/term_master.md)
 * [ユーザーScope同意履歴](Data/RDB_Table/user_client_scope_consent.md)
 * [ユーザー属性テーブル](Data/RDB_Table/user_info.md)
 * [ユーザー規約同意履歴](Data/RDB_Table/user_term_consent.md)

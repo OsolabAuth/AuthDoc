@@ -12,7 +12,7 @@
 | 属性キー管理マスタ | [data_key_master](./RDB_Table/data_key_master.md) | UserInfoで利用する属性キー定義を管理する |
 | クライアント属性許可テーブル | [client_data_key](./RDB_Table/client_data_key.md) | クライアントが利用可能な属性キーを管理する |
 
-### 仕様実装に必要な追加テーブル
+### 実装済みテーブル（拡張分）
 
 | TableName | PhysicalName | Purpose |
 | :--- | :--- | :--- |
@@ -20,23 +20,19 @@
 | Scope管理マスタ | [scope_master](./RDB_Table/scope_master.md) | OpenID Connect / OAuth2 の要求可能 scope を管理する |
 | クライアント許可Scope | [client_scope](./RDB_Table/client_scope.md) | クライアントごとに要求可能な scope を管理する |
 | Scope-Claimマッピング | [scope_data_key](./RDB_Table/scope_data_key.md) | scope と返却可能 claim を対応付ける |
-| 規約マスタ | [term_master](./RDB_Table/term_master.md) | 規約本文・版数・有効期間を管理する |
 | クライアント適用規約 | [client_term](./RDB_Table/client_term.md) | クライアントごとに同意対象とする規約を管理する |
 | ユーザー規約同意履歴 | [user_term_consent](./RDB_Table/user_term_consent.md) | ユーザーの規約同意結果と対象バージョンを記録する |
 | ユーザーScope同意履歴 | [user_client_scope_consent](./RDB_Table/user_client_scope_consent.md) | ユーザーがクライアントごとに同意した scope を記録する |
 
-## 仕様実装に対する不足整理
+## 実装反映ポイント
 
-| 対象 | 不足している内容 | 必要な対応 |
-| :--- | :--- | :--- |
-| 認可エンドポイント | `redirect_uri` の事前登録先がない | `client_redirect_uri` を追加し、`client_id` ごとに複数管理する |
-| トークンエンドポイント | 認可時と同一 `redirect_uri` の照合元がない | `client_redirect_uri` と認可コード保存値の両方で完全一致検証する |
-| 規約表示・同意 | 規約マスタ、クライアント別適用設定、同意履歴がない | `term_master`、`client_term`、`user_term_consent` を追加する |
-| scope検証 | 要求可能scopeのマスタとクライアント別許可設定がない | `scope_master`、`client_scope` を追加する |
-| UserInfo返却 | scope と claim の対応表がない | `scope_data_key` を追加する |
-| scope同意状態 | ユーザーがクライアントごとに何に同意したか保持できない | `user_client_scope_consent` を追加する |
-| クライアント認証方式 | `client_master` だけでは public/confidential や認証方式を表現できない | `client_master` に種別列を追加するか別設定テーブルで管理する |
-| 同意監査 | 最新状態しか持てない設計だと同意履歴が追えない | 規約・scopeともに履歴テーブルとして保存する |
+| 対象 | 実装内容 |
+| :--- | :--- |
+| リダイレクトURI管理 | `client_redirect_uri` で `client_id` ごとに複数URIを管理 |
+| scope検証 | `scope_master` + `client_scope` で要求可能scopeを管理 |
+| UserInfo返却 | `scope_data_key` で scope と claim を対応付け |
+| 規約表示・同意 | `client_term` で `term_id` / `term_version` / `term_url` / `required` を管理し、同意履歴は `user_term_consent` に保存 |
+| scope同意状態 | `user_client_scope_consent` にクライアント単位で保存 |
 
 ## 既存テーブルの拡張ポイント
 
@@ -49,7 +45,7 @@
 ## 補足
 
 - 実装済みDDLは `Auth/SQL/000_init_db.sql` を基準としている。
-- 追加テーブルは現行ソースコード未実装だが、`authfoundation-docs/API` および `authfoundation-docs/Architecture` の仕様を成立させるために必要な設計として整理した。
+- 追加分として整理していたテーブルは現行DDLに実装済み。
 - ログインセッション、認可コード、アクセストークン、IDトークン失効管理は [Redis.md](./Redis.md) の責務であり、本書ではRDB要素に限定して記載する。
 
 ## ER図
@@ -82,6 +78,7 @@ entity "scope_master" as scope_master {
   *scope : varchar(64)
   --
   description : nvarchar(255)
+  confidential_only : tinyint
   create_datetime : datetime2(0)
   update_datetime : datetime2(0)
   status : tinyint
@@ -137,27 +134,14 @@ entity "user_info" as user_info {
   status : tinyint
 }
 
-entity "term_master" as term_master {
-  *term_id : varchar(64)
-  --
-  term_type : varchar(32)
-  title : nvarchar(255)
-  version : varchar(32)
-  content : nvarchar(max)
-  effective_start_datetime : datetime2(0)
-  effective_end_datetime : datetime2(0)
-  create_datetime : datetime2(0)
-  update_datetime : datetime2(0)
-  status : tinyint
-}
-
 entity "client_term" as client_term {
   *sequence_id : bigint
   --
   client_id : varchar(32)
   term_id : varchar(64)
+  term_version : varchar(32)
+  term_url : nvarchar(2048)
   required : tinyint
-  display_order : int
   create_datetime : datetime2(0)
   update_datetime : datetime2(0)
   status : tinyint
@@ -199,8 +183,6 @@ osolab_user ||--o{ user_client_scope_consent
 scope_master ||--o{ client_scope
 scope_master ||--o{ scope_data_key
 data_key_master ||--o{ scope_data_key
-term_master ||--o{ client_term
-term_master ||--o{ user_term_consent
 
 @enduml
 ```
