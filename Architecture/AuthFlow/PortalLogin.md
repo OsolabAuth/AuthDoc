@@ -1,21 +1,28 @@
-# 認証フロー
+# 認証フロー(ポータルサイト)
 
 ## ■ フロー概要
-Authorization Code Flow
+Authorization Code Flow(ポータルサイト用)
 
 ## ■ シーケンス
 
 ```plantuml
 @startuml
 actor User
-participant Client
-participant "AuthFoundation" as auth
-database rdb
-database mdb
-
-User -> Client : ログイン開始
+box OsolabAuth #0000ff0f
+    participant "portal.osolab-auth" as portal
+    participant "api.osolab-auth" as bff
+    database bffdb
+    participant "auth.osolab-auth" as auth
+    database rdb
+    database mdb
+end box
+User -> portal : ポータルサイトを開く
+User <- portal : ポータルサイトとログインボタンを表示
+User -> portal : ログイン開始
+portal -> bff : GET(/login)
 group 認可エンドポイント
-    Client -> auth : GET(/authorize)
+
+    bff -> auth : GET(/authorize)
     note right
         Header
         Query
@@ -35,7 +42,7 @@ group 認可エンドポイント
             note right
                 key: Cookie.session_id 
             end note 
-            auth <-- mdb : ログインセッション情報
+            auth <-- mdb : ログンセッション情報
         end
     end
 
@@ -64,7 +71,7 @@ group 認可エンドポイント
                 auth <-- mdb
             end
 
-            Client <- auth : 認可コードを付与してリダイレクトURLにリダイレクト依頼
+            bff <- auth : 認可コードを付与してリダイレクトURLにリダイレクト依頼
         else
             group 認可セッション発行
                 auth -> mdb : Set:DB6
@@ -92,23 +99,20 @@ group 認可エンドポイント
                 「認可セッション発行」参照
             end note
         end
-        User <- auth : ログイン画面に遷移依頼
-        note right
-            Portal UI方式ではsession_idをURL queryに付与しない。
-            /authorizeのレスポンスBodyで返却し、Portal UIがlocalStorageに保持する。
-        end note
+        User <- auth : ログイン画面にリダイレクト依頼(認可セッションID)
     end
 
     group ログイン
-        User -> auth : GET(/login)
-        User <- auth : 認証画面
-        User -> User : ID/パスワードを入力(ハッシュ化)
-        User -> auth : POST(/login)
+        User -> portal : GET(/login)
+        portal -> portal : 認可セッションIDをローカルストレージに保存
+        User <- portal : 認証画面
+        User -> portal : ID/パスワードを入力(ハッシュ化)
+        portal -> auth : POST(/login)
         note right
             Header
+                x-session-id : ローカルストレージ.認可セッションID
                 Content-Type : application/x-www-form-urlencoded
             Body
-                session_id=認可セッションID
                 email=email
                 password=passwordハッシュ
         end note
@@ -138,7 +142,7 @@ group 認可エンドポイント
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: Body.session_id
+                key: x-session-id
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -155,7 +159,7 @@ group 認可エンドポイント
                 end note
             end
 
-            Client <- auth : 認可コードを付与してリダイレクトURLにリダイレクト依頼
+            bff <- auth : 認可コードを付与してリダイレクトURLにリダイレクト依頼
         else
             group 認可セッション発行
                 note over auth,mdb
@@ -167,31 +171,34 @@ group 認可エンドポイント
         
     end
     group 規約同意
-        User -> auth : POST(/terms/list)
+        User -> portal : GET(/terms)
         note right
             Header
-                Content-Type : application/x-www-form-urlencoded
-            Body
-                session_id=認可セッションID
+            Query
+                client_id:クライアントID
+        end note
+        portal -> auth : GET(client/terms)
+        note right
+            Header
+            Query
+                client_id:クライアントID
         end note
         note over auth,rdb
             RDBにclient_terms と client_scopesを取得する処理
         end note 
-        User <- auth : 規約画面
-        User -> User : 同意操作
-        User -> auth : POST(/terms)
+        portal <- auth : 規約,スコープ
+        User <- portal : 規約画面
+        User -> portal : 同意操作
+        portal -> auth : POST(/terms)
         note right
             Header
+                x-session-id : 認可セッションID
                 Content-Type : application/x-www-form-urlencoded
-            Body
-                session_id=認可セッションID
-                accepted=true/false
-                term_ids=規約ID
         end note
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: Body.session_id
+                key: x-session-id
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -205,12 +212,11 @@ group 認可エンドポイント
             end note
         end
 
-        Client <- auth : 認可コードを付与してリダイレクトURLにリダイレクト依頼
+        bff <- auth : 認可コードを付与してリダイレクトURLにリダイレクト依頼
     end
-
 end
 group トークンエンドポイント
-    Client -> auth : POST(/token)
+    bff -> auth : POST(/token)
     note right
         Header
             x-flow-type: AuthorizationCode
@@ -239,14 +245,11 @@ group トークンエンドポイント
     end note
     auth -> auth : access_token発行
     auth -> auth : id_token発行
-    Client <- auth : access_token, id_token, token_type
-    note left
-        Portal UIはaccess_token/id_token等をlocalStorageに保存する。
-    end note
+    bff <- auth : access_token, id_token, token_type
 end
 
 group user_infoエンドポイント
-    Client -> auth : GET(/userinfo)
+    bff -> auth : GET(/userinfo)
     note right
         Header
             Authorization: Bearer アクセストークン
@@ -264,10 +267,7 @@ group user_infoエンドポイント
             client_id: クライアントID or 00..00(共通クライアント)
             data_key in scope
     end note
-    Client <- auth : アクセストークンのscopeに紐づく会員情報
-    note left
-        Portal UIはUserInfo応答をlocalStorageに保存する。
-    end note
+    bff <- auth : アクセストークンのscopeに紐づく会員情報
 end
 @enduml
 ```

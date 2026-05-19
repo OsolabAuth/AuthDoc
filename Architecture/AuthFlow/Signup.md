@@ -9,9 +9,12 @@ Authorization Code Flow中のアカウント登録フロー
 @startuml
 actor User
 participant Client
-participant "AuthFoundation" as auth
-database rdb
-database mdb
+box OsolabAuth #0000ff0f
+    participant "portal.osolab-auth" as portal
+    participant "auth.osolab-auth" as auth
+    database rdb
+    database mdb
+end box
 participant "MailProvider" as mail
 
 User -> Client : ログイン開始
@@ -57,8 +60,12 @@ group 認可エンドポイント
 end
 
 group アカウント登録
-    User -> auth : GET(/Signup/Account/view)
-    User <- auth : アカウント登録画面
+    User -> portal : GET(/login/)
+    User <- portal : ログイン画面
+    User -> portal : 新規登録リンクをクリック
+    User <-- portal
+    User -> portal : GET(/Signup/)
+    User <- portal : アカウント登録画面
 
     User -> User : email/passwordを入力(ハッシュ化)
     User -> auth : POST(/signup/account)
