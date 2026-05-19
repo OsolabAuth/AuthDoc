@@ -12,7 +12,7 @@ Portal UI から呼び出す場合は次を指定する。
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| x-auth-ui-session-mode | - | ^body$ | 認可セッションIDをURL queryに出さず、レスポンスBodyで返す |
+| x-auth-ui-session-mode | - | ^body$ | 認可セッションIDをURL queryに出さず、遷移先情報をレスポンスBodyで返す |
 
 ### ■ Query
 
@@ -37,6 +37,7 @@ Portal UI から呼び出す場合は次を指定する。
 | Name | Description |
 | :--- | :--- |
 | Location | リダイレクトレスポンス時のみ。ログイン画面、同意画面、または `redirect_uri` |
+| Set-Cookie | Portal UI モードで認可セッション発行時に `session_id` を設定 |
 
 ### ■ Body
 | Name | Type | Description |
@@ -44,7 +45,6 @@ Portal UI から呼び出す場合は次を指定する。
 | response_code | String | 非リダイレクトエラー時のみ必須。レスポンスコード |
 | result | String | `x-auth-ui-session-mode: body` 指定時のみ。`redirect` または `error` |
 | redirect_url | String | `x-auth-ui-session-mode: body` 指定時のみ。ログイン画面または同意画面のURL。`session_id` queryは含めない |
-| session_id | String | `x-auth-ui-session-mode: body` 指定時のみ。認可セッションID |
 | message | String | `x-auth-ui-session-mode: body` 指定時のみ。画面表示用メッセージ |
 
 ### ■ ResponseCode
@@ -59,8 +59,8 @@ Portal UI から呼び出す場合は次を指定する。
 ## ■ 処理概要
 - 認可リクエストを検証する
 - Auth Session が有効なら規約・scope 同意状態を確認する
-- 未ログイン時は認可セッションを発行し、通常リダイレクト方式ではクエリに付与して `GET /login` に遷移させる
-- Portal UI 方式では `session_id` をレスポンスBodyで返し、`redirect_url` には `session_id` を付与しない。Portal UI は `session_id` を `localStorage` に保持する
+- 未ログイン時は認可セッションを発行し、`Set-Cookie` で `session_id` を払い出して `GET /login` に遷移させる
+- Portal UI 方式では `session_id` を `Set-Cookie` で払い出し、`redirect_url` には `session_id` を付与しない
 - 同意済みなら認可コードを発行して `redirect_uri` へリダイレクトする
 - 未同意なら規約同意画面に遷移させる
 - `client_id` と `redirect_uri` が有効で、その後の検証で失敗した場合は `redirect_uri` のQueryに `response_code` を付与してリダイレクトする

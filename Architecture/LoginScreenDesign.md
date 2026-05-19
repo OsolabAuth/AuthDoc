@@ -25,7 +25,7 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
     MSG01: クライアント名へのアクセスを続行するにはログインしてください
   </div>
   <div style="margin-bottom: 18px; padding: 10px 12px; border: 1px dashed;">
-    LS01: localStorage session_id
+    CK01: Cookie session_id
   </div>
   <div style="margin-bottom: 16px;">
     <div style="margin-bottom: 6px;">TXT01: メールアドレス</div>
@@ -65,7 +65,7 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 | :--- | :--- | :--- | :---: | :--- |
 | LBL01 | タイトル | Label | - | 画面の目的を示す固定文言 |
 | MSG01 | 説明文 | Label | - | 認可処理継続のためのログインであることを説明 |
-| LS01 | session_id | LocalStorage | ○ | `/authorize` のレスポンスBodyで受け取り、Portal UI が `localStorage` に保持する認可セッションID |
+| CK01 | session_id | Cookie | ○ | `/authorize` の `Set-Cookie` で受け取り、Portal UI が Cookie に保持する認可セッションID |
 | TXT01 | メールアドレス | TextBox | ○ | ログイン対象メールアドレス |
 | TXT02 | パスワード | Password | ○ | クライアント側でハッシュ化して送信する元入力欄 |
 | CHK01 | ログイン状態保持 | CheckBox | - | セッション維持ポリシー拡張用の任意項目 |
@@ -77,7 +77,7 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 
 | 項目 | 要素ID | 形式 | バリデーション | 備考 |
 | :--- | :--- | :--- | :--- | :--- |
-| session_id | LS01 | String | `^[A-Fa-f0-9]{32}$` | Portal UI の `localStorage` から取得し、送信Bodyに設定する |
+| session_id | CK01 | String | `^[A-Fa-f0-9]{32}$` | Cookie から取得し、`POST /login` の送信時に自動付与される |
 | email | TXT01 | String | `^.+@.+$` | 前後空白は除去して検証 |
 | password | TXT02 | String | `^[A-Fa-f0-9]{64}$` | 送信時は SHA-256 の 16進文字列(64桁)を `password` として送る |
 
@@ -93,7 +93,7 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 | EV05 | BTN01 | クリック | 入力正常 | `password` をハッシュ化し `POST /login` を実行 | 応答待ち中はボタンを二重押下不可にする |
 | EV06 | BTN01 | API成功 | `result=redirect` | Cookie 反映後、`Location` へ遷移 | 認可処理または規約同意へ進む |
 | EV07 | BTN01 | API失敗 | `result=error` | `message` を MSG02 に表示 | 画面に留まり再入力可能 |
-| EV08 | LNK01 | クリック | なし | 新規登録画面へ遷移 | `session_id` をURLに付与せず、`localStorage` で維持して遷移 |
+| EV08 | LNK01 | クリック | なし | 新規登録画面へ遷移 | `session_id` をURLに付与せず、Cookieで維持して遷移 |
 
 ## ■ API送信仕様
 
@@ -103,8 +103,8 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 | :--- | :--- |
 | Method | `POST` |
 | Path | `/login` |
-| Header | `Content-Type: application/x-www-form-urlencoded` |
-| Body | `session_id={LS01}&email={TXT01}&password={hash(TXT02)}` |
+| Header | `Cookie: session_id={CK01}`、`Content-Type: application/x-www-form-urlencoded` |
+| Body | `email={TXT01}&password={hash(TXT02)}` |
 
 ### Response
 
@@ -136,6 +136,6 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 
 ## ■ 補足
 
-- `session_id` はURL queryに出さない。Portal UI が `/authorize` のレスポンスBodyから取得して `localStorage` に保持し、送信時はBodyの `session_id` に設定する。
+- `session_id` はURL queryに出さない。Portal UI が `/authorize` の `Set-Cookie` で受け取り、送信時はCookieで引き継ぐ。
 - クライアント側ハッシュ化の詳細仕様は別途フロントエンド実装規約で定義する。
 - `CHK01` は現時点では任意項目だが、将来のセッション保持ポリシー拡張を見越して識別子を確保する。

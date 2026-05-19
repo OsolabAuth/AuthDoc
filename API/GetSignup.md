@@ -38,6 +38,6 @@ GET /signup
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- Portal UI では認可セッションIDをURL queryで受け取らない。`/authorize` のレスポンスBodyで受け取った `session_id` を `localStorage` に保持する
+- Portal UI では認可セッションIDをURL queryで受け取らない。`/authorize` の `Set-Cookie` で付与された `session_id` を利用する
 - メールアドレスとパスワードを入力するための登録画面を返却する
 - 必須情報が追加されたら画面項目を追加する

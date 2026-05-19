@@ -19,7 +19,7 @@ group ログアウトエンドポイント
     Client -> auth : POST(/Logout)
     note right
         Header
-            Cookie.session_id : ログインセッションID
+            Cookie.AuthSessionId : ログインセッションID
             Authorization: Bearer アクセストークン(任意)
             Content-Type : application/x-www-form-urlencoded
         Body
@@ -29,10 +29,10 @@ group ログアウトエンドポイント
     auth -> auth : CookieからセッションIDを取得
 
     group ログインセッション確認
-        opt Cookie.session_idが存在する場合
+        opt Cookie.AuthSessionIdが存在する場合
             auth -> mdb : Get:DB1
             note right
-                key: Cookie.session_id
+                key: Cookie.AuthSessionId
             end note
             auth <-- mdb : ログインセッション情報
         end
@@ -43,13 +43,13 @@ group ログアウトエンドポイント
         group ログインセッション削除
             auth -> mdb : Delete:DB1
             note right
-                key: Cookie.session_id
+                key: Cookie.AuthSessionId
             end note
             auth <-- mdb
         end
 
         group Cookie削除
-            auth -> auth : Cookie.session_idを削除
+            auth -> auth : Cookie.AuthSessionId と Cookie.session_id を削除
         end
 
         opt Authorizationヘッダーが存在する場合

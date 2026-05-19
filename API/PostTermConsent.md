@@ -9,6 +9,7 @@ POST /terms
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
+| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
@@ -18,7 +19,6 @@ POST /terms
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| session_id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID。Portal UI では `localStorage` から取得してBodyに設定する |
 | accepted | ○ | ^(true\|false\|on)$ | 規約同意可否 |
 | term_ids | ○ | - | 同意対象規約ID。複数時は同名項目を繰り返す |
 
@@ -46,7 +46,7 @@ POST /terms
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- Body の `session_id` から認可セッションを取得する。互換性のため `x-session-id` header も受け付けるが、Portal UI はBodyを使用する
+- Cookie の `session_id` から認可セッションを取得する
 - 最新規約に対する同意情報を登録する
 - 同意済みの場合は認可コードを発行し、`redirect_uri` に `code` と `state` を付与してリダイレクトする
 - 拒否時は `error=access_denied` を付与してリダイレクトする

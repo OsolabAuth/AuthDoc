@@ -55,7 +55,7 @@ group 認可エンドポイント
     User <- auth : ログイン画面に遷移依頼
     note right
         Portal UI方式ではsession_idをURL queryに付与しない。
-        /authorizeのレスポンスBodyで返却し、Portal UIがlocalStorageに保持する。
+        /authorizeのSet-Cookieで付与し、Portal UIはCookieで保持する。
     end note
 end
 
@@ -71,9 +71,9 @@ group アカウント登録
     User -> auth : POST(/signup/account)
     note right
         Header
+            Cookie : session_id=認可セッションID
             Content-Type : application/x-www-form-urlencoded
         Body
-            session_id=認可セッションID
             email=email
             password=passwordハッシュ
     end note
@@ -81,7 +81,7 @@ group アカウント登録
     group 認可セッション取得
         auth -> mdb : Get:DB6
         note right
-            key: Body.session_id
+            key: Cookie.session_id
         end note
         auth <-- mdb : 認可セッション情報
     end

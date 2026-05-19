@@ -9,16 +9,14 @@ POST /terms/list
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
+| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
 なし
 
 ### ■ Body
-
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| session_id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID。Portal UI では `localStorage` から取得してBodyに設定する |
+なし
 
 ## Response
 
@@ -48,6 +46,6 @@ POST /terms/list
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- Body の `session_id` から認可セッションを取得する
+- Cookie の `session_id` から認可セッションを取得する
 - 認可セッションに紐づくクライアントの規約設定と要求 scope を取得する
 - 同意画面の描画に必要なデータを返却する

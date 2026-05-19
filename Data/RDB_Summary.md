@@ -23,6 +23,7 @@
 | クライアント適用規約 | [client_term](./RDB_Table/client_term.md) | クライアントごとに同意対象とする規約を管理する |
 | ユーザー規約同意履歴 | [user_term_consent](./RDB_Table/user_term_consent.md) | ユーザーの規約同意結果と対象バージョンを記録する |
 | ユーザーScope同意履歴 | [user_client_scope_consent](./RDB_Table/user_client_scope_consent.md) | ユーザーがクライアントごとに同意した scope を記録する |
+| JWK管理マスタ | [jwk_master](./RDB_Table/jwk_master.md) | IDトークン署名鍵の公開情報と暗号化済み秘密鍵を管理する |
 
 ## 実装反映ポイント
 
@@ -33,6 +34,7 @@
 | UserInfo返却 | `scope_data_key` で scope と claim を対応付け |
 | 規約表示・同意 | `client_term` で `term_id` / `term_version` / `term_url` / `required` を管理し、同意履歴は `user_term_consent` に保存 |
 | scope同意状態 | `user_client_scope_consent` にクライアント単位で保存 |
+| IDトークン署名鍵 | `jwk_master` で公開鍵と暗号化済み秘密鍵を管理し `GET /jwks` に公開 |
 
 ## 既存テーブルの拡張ポイント
 
@@ -107,6 +109,23 @@ entity "scope_data_key" as scope_data_key {
   --
   scope : varchar(64)
   data_key : varchar(64)
+  create_datetime : datetime2(0)
+  update_datetime : datetime2(0)
+  status : tinyint
+}
+
+entity "jwk_master" as jwk_master {
+  *sequence_id : bigint
+  --
+  kid : varchar(64)
+  kty : varchar(16)
+  alg : varchar(16)
+  key_use : varchar(16)
+  public_n : varchar(512)
+  public_e : varchar(16)
+  private_key_ciphertext : varbinary(max)
+  private_key_iv : varbinary(12)
+  private_key_tag : varbinary(16)
   create_datetime : datetime2(0)
   update_datetime : datetime2(0)
   status : tinyint

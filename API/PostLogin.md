@@ -9,6 +9,7 @@ POST /login
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
+| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
@@ -18,7 +19,6 @@ POST /login
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| session_id | - | ^[A-Fa-f0-9]{32}$ | 認可セッションID。Portal UI では `localStorage` から取得してBodyに設定する |
 | email | ○ | ^.+@.+$ | ログイン対象メールアドレス |
 | password | ○ | ^[A-Fa-f0-9]{64}$ | SHA-256 の 16進文字列(64桁) |
 
@@ -49,7 +49,7 @@ POST /login
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- Body の `session_id` を用いて認可セッションを取得する。互換性のため `x-session-id` header も受け付けるが、Portal UI はBodyを使用する
+- Cookie の `session_id` から認可セッションを取得する
 - メールアドレスで有効なユーザーを検索し、パスワードを検証する
 - 認証成功時は Auth Session を払い出し、Cookie に設定する
 - 規約・scope 同意済みなら認可コードを発行し `redirect_uri` へリダイレクトする
