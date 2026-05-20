@@ -8,5 +8,4 @@
 | 2 | 認可コード | code | code<br>osolab_id<br>client_id<br>created_at<br>expires_at<br>scope<br>code_challenge<br>nonce<br>state | 300 | - |
 | 3 | アクセストークン | `osolab_id_tokenid_client_id` | token<br>osolab_id<br>client_id<br>created_at<br>expires_at<br>scope | 900 | tokenはHEX16のosolab_id、HEX32のtoken_id、数字32桁のclient_idを `_` 連結 |
 | 4 | リフレッシュトークン | `osolab_id_tokenid_client_id` | token<br>osolab_id<br>client_id<br>created_at<br>expires_at<br>scope | 2592000 | tokenはHEX16のosolab_id、HEX32のtoken_id、数字32桁のclient_idを `_` 連結 |
-| 5 | IDトークンブラックリスト | jti | jti<br>osolab_id<br>client_id<br>revoked_at<br>expires_at<br>scope | IDトークン有効期限の残り秒数 | - |
-| 6 | 認可セッション | session_id(HEX32) | session_id<br>osolab_id<br>client_id<br>expires_at<br>latest_auth_at | 300 | 認可コード発行までの画面用セッション |
+| 5 | 認可セッション | session_id(HEX32) | session_id<br>osolab_id<br>client_id<br>expires_at<br>latest_auth_at | 300 | 認可コード発行までの画面用セッション |
