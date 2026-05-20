@@ -1,51 +1,59 @@
 # ログアウト
 
-## ■ Endpoint
-POST /logout
+## Endpoint
+
+`POST /logout`
 
 ## Request
 
-### ■ Header
+### Header
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| Cookie | ○ | - | AuthSessionId を含む |
-| Authorization | - | ^Bearer [A-Fa-f0-9]{16}_[A-Fa-f0-9]{32}_[0-9]{32}$ | 失効対象アクセストークン |
-| Content-Type | ○ | - | application/x-www-form-urlencoded |
+| Cookie | - | `(^|;\s*)(AuthSessionId|session_id)=[A-Fa-f0-9]{32}($|;)` | 削除対象の認証セッションCookie。未指定でも冪等に成功する。 |
+| Authorization | - | `^Bearer [A-Za-z0-9._~+/=-]+$` | 削除対象のアクセストークン。指定された場合はアクセストークンセッションも削除する。 |
+| Content-Type | ○ | - | `application/x-www-form-urlencoded` |
 
-### ■ Query
+### Query
+
 なし
 
-### ■ Body
+### Body
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| logout_all | ○ | ^(true\|false)$ | 全端末ログアウト要否 |
+| logout_all | ○ | `^(true|false)$` | 全端末ログアウト要求フラグ。現行実装では入力値を検証し、レスポンスへ返す。 |
 
 ## Response
 
-### ■ Header
+### Header
 
 | Name | Description |
 | :--- | :--- |
-| Set-Cookie | AuthSessionId削除 |
+| Set-Cookie | `AuthSessionId` と `session_id` を期限切れにして削除する。 |
 
-### ■ Body
+### Body
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
-| result | String | 処理結果。`logged_out` または `already_logged_out` |
+| response_code | string | 処理結果コード。 |
+| result | string | `logged_out` または `already_logged_out`。 |
+| logout_all | boolean | リクエストで指定された全端末ログアウト要求フラグ。 |
 
-### ■ ResponseCode
+## Response Code
 
-| Code | HttpStatusCode | Description |
-| :--- | :--- | :--- |
-| 00000 | 200 | OK |
-| 00001 | 400 | リクエストの内容が異常です |
-| 90000 | 500 | ハンドルされていないエラーが発生しました |
+| Code | HTTP Status | Description |
+| :--- | :---: | :--- |
+| 00000 | 200 | ログアウト成功。セッション未存在の場合も冪等に成功する。 |
+| 00001 | 400 | リクエスト形式、`logout_all`、または `Authorization` ヘッダーが不正。 |
+| 90000 | 500 | 想定外のサーバエラー。 |
 
-## ■ 処理概要
-- Cookie から Auth Session を取得し、存在する場合は削除する
-- 指定がある場合は Bearer アクセストークンを失効させる
-- ID トークン失効情報を登録する
-- `logout_all=true` の場合はユーザー単位の全セッション失効日時を登録する
+## Processing
+
+1. `Content-Type` とフォームボディを検証する。
+2. `logout_all` が `true` または `false` であることを検証する。
+3. `Authorization` ヘッダーが指定されている場合はBearer形式を検証する。
+4. Cookieに認証セッションIDが存在する場合は、Redis上の認証セッションを削除する。
+5. Bearerトークンが指定されている場合は、アクセストークンセッションを削除する。
+6. `AuthSessionId` と `session_id` のCookieを削除する。
+7. セッション削除結果と `logout_all` を返す。
