@@ -68,12 +68,12 @@ if (ログイン画面？) then (はい)
   endif
 endif
 
-:GET /terms;
+:POST /terms/list\nsession_idはCookie;
 :Authorization Request取得;
 :規約・scope表示;
 
 if (ユーザーが同意？) then (はい)
-  :POST /terms\nauthorization_request_id付き;
+  :POST /terms\nsession_idはCookie;
   :同意情報を登録;
 
   :authorization_code発行;

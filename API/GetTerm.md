@@ -1,7 +1,7 @@
 # 規約取得
 
 ## ■ Endpoint
-GET /terms
+POST /terms/list
 
 ## Request
 
@@ -9,7 +9,8 @@ GET /terms
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
+| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
+| Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
 なし
@@ -31,6 +32,7 @@ GET /terms
 | terms[].term_id | String | 規約識別子 |
 | terms[].title | String | 規約名 |
 | terms[].version | String | 規約バージョン |
+| terms[].term_url | String | 規約表示URL |
 | terms[].required | Boolean | 必須同意かどうか |
 | scopes | Array<String> | 認可要求で要求されたスコープ一覧 |
 
@@ -44,6 +46,6 @@ GET /terms
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- `x-session-id` から認可セッションを取得する
-- 認可セッションに紐づくクライアントの最新規約と要求 scope を取得する
+- Cookie の `session_id` から認可セッションを取得する
+- 認可セッションに紐づくクライアントの規約設定と要求 scope を取得する
 - 同意画面の描画に必要なデータを返却する

@@ -7,8 +7,8 @@ POST /signup/account
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
+| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
-| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
 
 ## ■ Request Body
 
@@ -40,7 +40,7 @@ POST /signup/account
 | 90001 | 500 | ID生成に失敗しました |
 
 ## ■ 処理概要
-- 認可セッションを取得し、対象クライアントを特定する
+- Cookie の `session_id` から認可セッションを取得し、対象クライアントを特定する
 - メールアドレス重複を確認する
 - 仮ユーザーを登録し、メール認証用トークンを発行する
 - 認証メールを送信し、メール確認待ち状態を返却する

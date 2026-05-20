@@ -9,7 +9,7 @@ POST /terms
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| x-session-id | ○ | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
+| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
@@ -46,7 +46,7 @@ POST /terms
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- `x-session-id` から認可セッションを取得する
+- Cookie の `session_id` から認可セッションを取得する
 - 最新規約に対する同意情報を登録する
 - 同意済みの場合は認可コードを発行し、`redirect_uri` に `code` と `state` を付与してリダイレクトする
 - 拒否時は `error=access_denied` を付与してリダイレクトする

@@ -9,7 +9,7 @@ POST /login
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| x-session-id | - | ^[A-Fa-f0-9]{32}$ | 認可セッションID |
+| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
@@ -49,9 +49,9 @@ POST /login
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- `x-session-id` を用いて認可セッションを取得する
+- Cookie の `session_id` から認可セッションを取得する
 - メールアドレスで有効なユーザーを検索し、パスワードを検証する
 - 認証成功時は Auth Session を払い出し、Cookie に設定する
 - 規約・scope 同意済みなら認可コードを発行し `redirect_uri` へリダイレクトする
-- 未同意なら `GET /terms` へ遷移させる
+- 未同意なら規約同意画面へ遷移させる
 - セッションが存在しない場合は、Cookieをログイン状態にするが、リダイレクトせずにエラーコードを返却し、resultはlogged_inにする

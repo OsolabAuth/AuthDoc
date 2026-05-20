@@ -39,10 +39,10 @@ group 認可エンドポイント
     end note
     auth -> auth : CookieからセッションIDを取得
     group ログイン済み確認
-        opt Cookie.session_idが存在する場合
+        opt Cookie.AuthSessionIdが存在する場合
             auth -> mdb : Get:DB1 
             note right
-                key: Cookie.session_id 
+                key: Cookie.AuthSessionId
             end note 
             auth <-- mdb : ログンセッション情報
         end
@@ -101,17 +101,21 @@ group 認可エンドポイント
                 「認可セッション発行」参照
             end note
         end
-        User <- auth : ログイン画面にリダイレクト依頼(認可セッションID)
+        User <- auth : ログイン画面に遷移依頼
+        note right
+            Portal UI方式ではsession_idをURL queryに付与しない。
+            /authorizeのSet-Cookieで付与し、Portal UIはCookieで保持する。
+        end note
     end
     group ログイン
         User -> portal : GET(/login)
-        portal -> portal : 認可セッションIDをローカルストレージに保存
+        portal -> portal : Cookieの認可セッションIDを利用
         User <- portal : 認証画面
         User -> portal : ID/パスワードを入力(ハッシュ化)
         portal -> auth : POST(/login)
         note right
             Header
-                x-session-id : ローカルストレージ.認可セッションID
+                Cookie : session_id=認可セッションID
                 Content-Type : application/x-www-form-urlencoded
             Body
                 email=email
@@ -143,7 +147,7 @@ group 認可エンドポイント
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: x-session-id
+                key: Cookie.session_id
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -181,8 +185,8 @@ group 認可エンドポイント
         portal -> auth : GET(client/terms)
         note right
             Header
-            Query
-                client_id:クライアントID
+                Cookie : session_id=認可セッションID
+                Content-Type : application/x-www-form-urlencoded
         end note
         note over auth,rdb
             RDBにclient_terms と client_scopesを取得する処理
@@ -193,13 +197,16 @@ group 認可エンドポイント
         portal -> auth : POST(/terms)
         note right
             Header
-                x-session-id : 認可セッションID
+                Cookie : session_id=認可セッションID
                 Content-Type : application/x-www-form-urlencoded
+            Body
+                accepted=true/false
+                term_ids=規約ID
         end note
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: x-session-id
+                key: Cookie.session_id
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -276,6 +283,9 @@ group user_infoエンドポイント
             data_key in scope
     end note
     Client <- auth : アクセストークンのscopeに紐づく会員情報
+    note left
+        Portal UIはUserInfo応答をlocalStorageに保存する。
+    end note
 end
 @enduml
 ```

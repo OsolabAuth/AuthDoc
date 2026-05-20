@@ -36,3 +36,8 @@ GET /jwks
 | :--- | :--- | :--- |
 | 00000 | 200 | OK |
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
+
+## 補足
+
+- レスポンスの公開鍵は `auth.jwk_master` の `status=1` レコードから生成する。
+- 秘密鍵は `JwkPrivateKeyEncryptionKey` を使って AES-GCM で暗号化保存し、本APIでは公開しない。
