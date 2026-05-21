@@ -1,39 +1,35 @@
-# メール認証
+# 認証コード検証
 
 ## Endpoint
 
-`GET /signup/verify`
+`POST /signup/verify`
 
 ## Request
 
 ### Header
 
-なし
+| Name | Required | Regex | Description |
+| :--- | :---: | :--- | :--- |
+| Cookie | ○ | `(^|;\s*)signup_session_id=[A-Fa-f0-9]{32}($|;)` | 認証コード検証用セッションID。 |
+| Content-Type | ○ | - | `application/x-www-form-urlencoded` |
 
 ### Query
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| token | ○ | `^[A-Za-z0-9_-]{20,}$` | メール認証セッションを識別するトークン。 |
-| code | ○ | `^[0-9]{5}$` | メールで通知した5桁の認証コード。 |
+なし
 
 ### Body
 
-なし
+| Name | Required | Regex | Description |
+| :--- | :---: | :--- | :--- |
+| code | ○ | `^[0-9]{5}$` | メールで通知した5桁の認証コード。 |
 
 ## Response
 
 ### Header
 
-| Name | Description |
-| :--- | :--- |
-| Set-Cookie | メール認証成功時に認証セッションCookieを発行する。互換性のため `AuthSessionId` と `session_id` を設定する。 |
-| Location | 認可フロー継続後のリダイレクト先URL。 |
+なし
 
 ### Body
-
-成功時はリダイレクトするためレスポンスボディは使用しない。
-エラー時は以下を返す。
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
@@ -44,14 +40,12 @@
 
 | Code | HTTP Status | Description |
 | :--- | :---: | :--- |
-| 00001 | 400 | `token` または `code` が不正。認証コード不一致、認証セッション不正、仮登録ユーザー不在も含む。 |
-| 00003 | 400 | 認可セッションが存在しない、または期限切れ。 |
+| 00000 | 200 | 認証コード検証成功。 |
+| 00001 | 400 | `signup_session_id` または `code` が不正、または認証コード不一致。 |
+| 90000 | 500 | 想定外のサーバエラー。 |
 
 ## Processing
 
-1. `token` と `code` の形式を検証する。
-2. メール認証セッションを取得し、認証コードを照合する。
-3. 仮登録ユーザーを有効化する。
-4. メール認証セッションを削除する。
-5. 認証セッションを作成し、Cookieへ保存する。
-6. 認可フローを継続し、同意画面またはリダイレクト先へ遷移する。
+1. `signup_session_id` と `code` の形式を検証する。
+2. サインアップセッションを取得し、入力コードと保存コードを照合する。
+3. 検証成功時、サインアップセッションを認証済みに更新する。

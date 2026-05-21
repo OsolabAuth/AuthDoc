@@ -1,4 +1,4 @@
-﻿# Summary
+# Summary
 
 * [Introduction](README.md)
 
@@ -7,15 +7,16 @@
 * [JWKsエンドポイント](API/GetJwks.md)
 * [ログイン画面表示](API/GetLogin.md)
 * [新規登録画面表示](API/GetSignup.md)
-* [メール認証](API/GetSignupVerify.md)
+* [認証コード検証](API/GetSignupVerify.md)
 * [規約取得](API/GetTerm.md)
 * [UserInfoエンドポイント](API/GetUserinfo.md)
 * [OpenID Configurationエンドポイント](API/GetWellKnown.md)
 * [認証基盤ログイン](API/PostLogin.md)
 * [ログアウト](API/PostLogout.md)
+* [認証コード送信](API/PostSignupEmail.md)
 * [規約同意](API/PostTermConsent.md)
 * [トークンエンドポイント](API/PostToken.md)
-* [新規登録](API/signup.md)
+* [アカウント登録](API/signup.md)
 
 ## Architecture
 * [認証フロー](Architecture/AuthFlow/AuthorizationCodeFlow.md)

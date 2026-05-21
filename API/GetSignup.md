@@ -26,7 +26,7 @@ GET /signup
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
-| html | String | メールアドレス、パスワード入力欄と登録送信フォームを含むHTML |
+| html | String | メールアドレス入力、認証コード検証、パスワード登録の3段階フォームを含むHTML |
 
 ### ■ ResponseCode
 
@@ -39,5 +39,5 @@ GET /signup
 
 ## ■ 処理概要
 - Portal UI では認可セッションIDをURL queryで受け取らない。`/authorize` の `Set-Cookie` で付与された `session_id` を利用する
-- メールアドレスとパスワードを入力するための登録画面を返却する
+- メールアドレス送信 → 認証コード検証 → パスワード登録を順に実行できる登録画面を返却する
 - 必須情報が追加されたら画面項目を追加する
