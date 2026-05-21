@@ -23,6 +23,7 @@ end
 
 == 認証 ==
 User -> Client : ログイン開始
+User <- Client : 認可エンドポイントにリダイレクト依頼
 group 認可エンドポイント
     User -> auth : GET(/authorize)
     note right
