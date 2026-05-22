@@ -6,13 +6,7 @@ GET /authorize
 ## Request
 
 ### ■ Header
-通常リダイレクト方式ではなし。
-
-Portal UI から呼び出す場合は次を指定する。
-
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| x-auth-ui-session-mode | - | ^body$ | 認可セッションIDをURL queryに出さず、遷移先情報をレスポンスBodyで返す |
+なし。
 
 ### ■ Query
 
@@ -20,7 +14,7 @@ Portal UI から呼び出す場合は次を指定する。
 | :--- | :---: | :--- | :--- |
 | response_type | ○ | ^code$ | 認可コードフロー固定値 |
 | client_id | ○ | ^[0-9]{32}$ | クライアント識別子 |
-| redirect_uri | ○ | ^(https://.+\|http://localhost(:[0-9]+)?(/.*)?)$ | 認可結果のリダイレクト先。通常は `https`、検証用途の `localhost` のみ `http` を許容 |
+| redirect_uri | ○ | ^(https://.+&#124;http://localhost(:[0-9]+)?(/.*)?)$ | 認可結果のリダイレクト先。通常は `https`、検証用途の `localhost` のみ `http` を許容 |
 | state | ○ | ^.{1,255}$ | CSRF対策用のクライアント状態値 |
 | scope | ○ | ^[A-Za-z0-9_ ]+$ | 要求するスコープの空白区切り文字列 |
 | code_challenge_method | ○ | ^S256$ | PKCE チャレンジ方式 |
@@ -37,15 +31,15 @@ Portal UI から呼び出す場合は次を指定する。
 | Name | Description |
 | :--- | :--- |
 | Location | リダイレクトレスポンス時のみ。ログイン画面、同意画面、または `redirect_uri` |
-| Set-Cookie | Portal UI モードで認可セッション発行時に `session_id` を設定 |
+| Set-Cookie | 認可セッション発行時に `session_id` を設定 |
 
-### ■ Body
+### ■ Query
 | Name | Type | Description |
 | :--- | :--- | :--- |
-| response_code | String | 非リダイレクトエラー時のみ必須。レスポンスコード |
-| result | String | `x-auth-ui-session-mode: body` 指定時のみ。`redirect` または `error` |
-| redirect_url | String | `x-auth-ui-session-mode: body` 指定時のみ。ログイン画面または同意画面のURL。`session_id` queryは含めない |
-| message | String | `x-auth-ui-session-mode: body` 指定時のみ。画面表示用メッセージ |
+| code | String | 正常時のみ認可コードを設定 |
+| state | String | 正常時のみリクエストのstateを設定 |
+| error | String | エラー時のみ |
+| error\_description | String | エラー時のみ。エラー内容 |
 
 ### ■ ResponseCode
 
