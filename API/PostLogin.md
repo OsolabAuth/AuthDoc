@@ -10,7 +10,8 @@
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| Cookie | - | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可フロー継続用のセッションID。未指定の場合はログインのみ実行する。 |
+| Cookie | - | `(^|;\s*)(AuthRequestSessionId|session_id)=[A-Fa-f0-9]{32}($|;)` | 認可フロー継続用のセッションID。未指定の場合はログインのみ実行する。 |
+| x-session-id | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替で認可セッションIDを指定する場合に利用。 |
 | Content-Type | ○ | - | `application/x-www-form-urlencoded` |
 
 ### Query
@@ -21,6 +22,7 @@
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
+| session_id | - | `^[A-Fa-f0-9]{32}$` | 認可フロー継続用のセッションID。Cookie/ヘッダー未指定時の代替入力。 |
 | email | ○ | `^.+@.+$` | ログイン対象のメールアドレス。 |
 | password | ○ | `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,64}$` | パスワード。TLS上で送信し、サーバ側でArgon2idハッシュと照合する。 |
 

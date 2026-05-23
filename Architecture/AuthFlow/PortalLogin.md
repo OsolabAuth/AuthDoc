@@ -77,9 +77,9 @@ group 認可エンドポイント
                 auth -> mdb : Set:DB6
                 note right 
                     Key
-                        session_id
+                        auth_request_session_id
                     Value
-                        session_id
+                        auth_request_session_id
                         response_type: code
                         client_id:クライアントID
                         redirect_uri: リダイレクト先
@@ -110,11 +110,11 @@ group 認可エンドポイント
         portal -> auth : POST(/login)
         note right
             Header
-                Cookie : session_id=認可セッションID
+                Cookie : AuthRequestSessionId=認可セッションID(互換でsession_idも可)
                 Content-Type : application/x-www-form-urlencoded
             Body
                 email=email
-                password=passwordハッシュ
+                password=パスワード平文(TLS上で送信)
         end note
         auth -> rdb : ユーザー取得
         auth <-- rdb : osolab_user
@@ -123,7 +123,7 @@ group 認可エンドポイント
                 email = email
                 status = 1(active)
         end note
-        auth -> auth : HMAC-S256(passwordハッシュ+osolab_user.salt,key)とosolab_user.passhashの一致チェック
+        auth -> auth : Argon2idで算出したハッシュとDBのパスワードハッシュを照合
         group ログインセッション登録
             auth -> mdb : Set:DB1
             note right 
@@ -142,7 +142,7 @@ group 認可エンドポイント
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: Cookie.session_id
+                key: Cookie.AuthRequestSessionId(互換: Cookie.session_id)
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -177,12 +177,11 @@ group 認可エンドポイント
             Query
                 client_id:クライアントID
         end note
-        portal -> auth : GET(client/terms)
+        portal -> auth : POST(/terms/list)
         note right
             Header
-                Cookie : session_id=認可セッションID
-            Query
-                client_id:クライアントID
+                Cookie : AuthRequestSessionId=認可セッションID(互換でsession_idも可)
+                Content-Type : application/x-www-form-urlencoded
         end note
         note over auth,rdb
             RDBにclient_terms と client_scopesを取得する処理
@@ -193,13 +192,13 @@ group 認可エンドポイント
         portal -> auth : POST(/terms)
         note right
             Header
-                Cookie : session_id=認可セッションID
+                Cookie : AuthRequestSessionId=認可セッションID(互換でsession_idも可)
                 Content-Type : application/x-www-form-urlencoded
         end note
         group 認可セッション取得
             auth -> mdb : Get:DB6 
             note right
-                key: Cookie.session_id
+                key: Cookie.AuthRequestSessionId(互換: Cookie.session_id)
             end note 
             auth <-- mdb : 認可セッション情報
         end
@@ -237,10 +236,10 @@ group トークンエンドポイント
     auth -> mdb : アクセストークン登録
     note right 
         Key
-            token-id
+            access_token
         Value
-            token_id: token-id
-            user_id: osolab_id
+            access_token: osolab_id_tokenid_client_id
+            osolab_id: osolab_id
             scope: スコープ
             client_id:クライアントID
     end note
@@ -257,7 +256,7 @@ group user_infoエンドポイント
     end note
     auth -> mdb : アクセストークン取得
     note right 
-        Key token-id
+        Key access_token
     end note
     auth <-- mdb : トークン情報
     auth -> rdb : user情報取得

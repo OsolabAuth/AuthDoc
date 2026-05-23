@@ -25,7 +25,7 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
     MSG01: クライアント名へのアクセスを続行するにはログインしてください
   </div>
   <div style="margin-bottom: 18px; padding: 10px 12px; border: 1px dashed;">
-    CK01: Cookie session_id
+    CK01: Cookie AuthRequestSessionId
   </div>
   <div style="margin-bottom: 16px;">
     <div style="margin-bottom: 6px;">TXT01: メールアドレス</div>
@@ -65,9 +65,9 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 | :--- | :--- | :--- | :---: | :--- |
 | LBL01 | タイトル | Label | - | 画面の目的を示す固定文言 |
 | MSG01 | 説明文 | Label | - | 認可処理継続のためのログインであることを説明 |
-| CK01 | session_id | Cookie | ○ | `/authorize` の `Set-Cookie` で受け取り、Portal UI が Cookie に保持する認可セッションID |
+| CK01 | AuthRequestSessionId | Cookie | ○ | `/authorize` の `Set-Cookie` で受け取り、Portal UI が Cookie に保持する認可セッションID（互換で `session_id` も利用可） |
 | TXT01 | メールアドレス | TextBox | ○ | ログイン対象メールアドレス |
-| TXT02 | パスワード | Password | ○ | クライアント側でハッシュ化して送信する元入力欄 |
+| TXT02 | パスワード | Password | ○ | ユーザー入力の生パスワード（TLSで送信） |
 | CHK01 | ログイン状態保持 | CheckBox | - | セッション維持ポリシー拡張用の任意項目 |
 | BTN01 | ログイン | Button | ○ | 入力値検証後に `POST /login` を呼び出す |
 | LNK01 | 新規登録 | Link | - | アカウント未所持ユーザー向け導線 |
@@ -77,9 +77,9 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 
 | 項目 | 要素ID | 形式 | バリデーション | 備考 |
 | :--- | :--- | :--- | :--- | :--- |
-| session_id | CK01 | String | `^[A-Fa-f0-9]{32}$` | Cookie から取得し、`POST /login` の送信時に自動付与される |
+| auth_request_session_id | CK01 | String | `^[A-Fa-f0-9]{32}$` | Cookie `AuthRequestSessionId`（互換: `session_id`）から取得し、`POST /login` の送信時に自動付与される |
 | email | TXT01 | String | `^.+@.+$` | 前後空白は除去して検証 |
-| password | TXT02 | String | `^[A-Fa-f0-9]{64}$` | 送信時は SHA-256 の 16進文字列(64桁)を `password` として送る |
+| password | TXT02 | String | `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,64}$` | 平文のまま `password` として送信し、サーバ側でArgon2id照合する |
 
 ## ■ イベント一覧
 
@@ -90,10 +90,10 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 | EV02 | TXT02 | フォーカスアウト | 入力あり | 桁数チェック | 不正時は MSG02 にエラー表示 |
 | EV03 | BTN01 | クリック | 必須項目未入力 | 未入力チェック | 該当項目エラーを表示し送信しない |
 | EV04 | BTN01 | クリック | 入力形式不正 | 形式チェック | エラーを表示し送信しない |
-| EV05 | BTN01 | クリック | 入力正常 | `password` をハッシュ化し `POST /login` を実行 | 応答待ち中はボタンを二重押下不可にする |
+| EV05 | BTN01 | クリック | 入力正常 | `POST /login` を実行 | 応答待ち中はボタンを二重押下不可にする |
 | EV06 | BTN01 | API成功 | `result=redirect` | Cookie 反映後、`Location` へ遷移 | 認可処理または規約同意へ進む |
 | EV07 | BTN01 | API失敗 | `result=error` | `message` を MSG02 に表示 | 画面に留まり再入力可能 |
-| EV08 | LNK01 | クリック | なし | 新規登録画面へ遷移 | `session_id` をURLに付与せず、Cookieで維持して遷移 |
+| EV08 | LNK01 | クリック | なし | 新規登録画面へ遷移 | 認可セッションIDをURLに付与せず、Cookieで維持して遷移 |
 
 ## ■ API送信仕様
 
@@ -103,8 +103,8 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 | :--- | :--- |
 | Method | `POST` |
 | Path | `/login` |
-| Header | `Cookie: session_id={CK01}`、`Content-Type: application/x-www-form-urlencoded` |
-| Body | `email={TXT01}&password={hash(TXT02)}` |
+| Header | `Cookie: AuthRequestSessionId={CK01}`（互換: `session_id`）、`Content-Type: application/x-www-form-urlencoded` |
+| Body | `email={TXT01}&password={TXT02}` |
 
 ### Response
 
@@ -136,6 +136,5 @@ OAuth/OIDC の認可処理中に未ログインユーザーへ表示する認証
 
 ## ■ 補足
 
-- `session_id` はURL queryに出さない。Portal UI が `/authorize` の `Set-Cookie` で受け取り、送信時はCookieで引き継ぐ。
-- クライアント側ハッシュ化の詳細仕様は別途フロントエンド実装規約で定義する。
+- 認可セッションIDはURL queryに出さない。Portal UI が `/authorize` の `Set-Cookie`（`AuthRequestSessionId`/互換 `session_id`）で受け取り、送信時はCookieで引き継ぐ。
 - `CHK01` は現時点では任意項目だが、将来のセッション保持ポリシー拡張を見越して識別子を確保する。

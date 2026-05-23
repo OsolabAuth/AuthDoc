@@ -41,7 +41,7 @@ group 認可エンドポイント
     
     group #PaleGreen 認証処理 
         note over User,mdb
-            ①SSO処理(Cookieのosolab_auth_session_idを検証)
+            ①SSO処理(CookieのAuthSessionIdを検証)
             ②ID/Pass認証
             ③新規登録
             ④規約,scopeの連携への同意検証
@@ -61,7 +61,7 @@ group トークンエンドポイント
         Header
             x-flow-type: AuthorizationCode
             Content-Type : application/x-www-form-urlencoded
-            Authorization : Basic Base64(クライアントID:クライアントシークレット)
+            Authorization : Basic Base64(クライアントID:クライアントシークレット) (Confidential/Inner Client時のみ)
         Body
             grant_type=authorization_code
             code_verifier=code_verifier

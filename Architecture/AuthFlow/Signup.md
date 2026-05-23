@@ -3,6 +3,8 @@
 ## ■ フロー概要
 Authorization Code Flow中のアカウント登録フロー
 
+> 注意: 本書は旧仕様ベースの詳細検討ログです。現行実装とは差分があるため、実装判断には使用しないでください。実装準拠フローは `Architecture/AuthFlow/SignupSimple.md` と `API` 配下の各仕様書を正としてください。
+
 ## ■ シーケンス
 
 ```plantuml
@@ -37,9 +39,9 @@ group 認可エンドポイント
         auth -> mdb : Set:DB6
         note right
             Key
-                session_id
+                auth_request_session_id
             Value
-                session_id
+                auth_request_session_id
                 response_type: code
                 client_id:クライアントID
                 redirect_uri: リダイレクト先
@@ -54,7 +56,7 @@ group 認可エンドポイント
 
     User <- auth : ログイン画面に遷移依頼
     note right
-        Portal UI方式ではsession_idをURL queryに付与しない。
+        Portal UI方式ではAuthRequestSessionIdをURL queryに付与しない。
         /authorizeのSet-Cookieで付与し、Portal UIはCookieで保持する。
     end note
 end
@@ -71,17 +73,17 @@ group アカウント登録
     User -> auth : POST(/signup/account)
     note right
         Header
-            Cookie : session_id=認可セッションID
+            Cookie : AuthRequestSessionId=認可セッションID(互換でsession_idも可)
             Content-Type : application/x-www-form-urlencoded
         Body
             email=email
-            password=passwordハッシュ
+            password=パスワード平文(TLS上で送信)
     end note
 
     group 認可セッション取得
         auth -> mdb : Get:DB6
         note right
-            key: Cookie.session_id
+            key: Cookie.AuthRequestSessionId(互換: Cookie.session_id)
         end note
         auth <-- mdb : 認可セッション情報
     end
@@ -126,7 +128,7 @@ group アカウント登録
                     verification_token
                     osolab_id: osolab_user.osolab_id
                     email: email
-                    session_id: 認可セッションID
+                    auth_request_session_id: 認可セッションID
                     created_at: 現在時刻
                     expires_at: 現在時刻 + 1800
             end note
@@ -202,7 +204,7 @@ group メール認証
     group 認可セッション取得
         auth -> mdb : Get:DB6
         note right
-            key: メール認証セッション情報.session_id
+            key: メール認証セッション情報.auth_request_session_id
         end note
         auth <-- mdb : 認可セッション情報
     end

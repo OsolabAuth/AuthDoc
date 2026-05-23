@@ -19,19 +19,19 @@ if (AuthSessionId Cookieあり？) then (あり)
       :redirect_uriへリダイレクト\ncode + state;
       stop
     else (いいえ)
-      :authorization_request_id発行;
+      :auth_request_session_id発行;
       :Authorization RequestをRedis保存;
       :同意画面へリダイレクト;
     endif
 
   else (無効)
-    :authorization_request_id発行;
+    :auth_request_session_id発行;
     :Authorization RequestをRedis保存;
     :ログイン画面へリダイレクト;
   endif
 
 else (なし)
-  :authorization_request_id発行;
+  :auth_request_session_id発行;
   :Authorization RequestをRedis保存;
   :ログイン画面へリダイレクト;
 endif
@@ -41,7 +41,7 @@ if (ログイン画面？) then (はい)
   :ログイン画面表示;
 
   :email / password入力;
-  :POST /login\nauthorization_request_id付き;
+  :POST /login\nAuthRequestSessionId付き;
 
   :ユーザー取得;
   :パスワード検証;
@@ -68,12 +68,12 @@ if (ログイン画面？) then (はい)
   endif
 endif
 
-:POST /terms/list\nsession_idはCookie;
+:POST /terms/list\nAuthRequestSessionId(互換:session_id)はCookie;
 :Authorization Request取得;
 :規約・scope表示;
 
 if (ユーザーが同意？) then (はい)
-  :POST /terms\nsession_idはCookie;
+  :POST /terms\nAuthRequestSessionId(互換:session_id)はCookie;
   :同意情報を登録;
 
   :authorization_code発行;

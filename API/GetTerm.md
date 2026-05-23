@@ -9,14 +9,17 @@ POST /terms/list
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
+| Cookie | - | `(^|;\s*)(AuthRequestSessionId|session_id)=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
+| x-session-id | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替で認可セッションIDを指定する場合に利用 |
 | Content-Type | ○ | - | application/x-www-form-urlencoded |
 
 ### ■ Query
 なし
 
 ### ■ Body
-なし
+| Name | Required | Regex | Description |
+| :--- | :---: | :--- | :--- |
+| session_id | - | `^[A-Fa-f0-9]{32}$` | 認可セッションID。Cookie/ヘッダー未指定時の代替入力 |
 
 ## Response
 
@@ -46,6 +49,6 @@ POST /terms/list
 | 90000 | 500 | ハンドルされていないエラーが発生しました |
 
 ## ■ 処理概要
-- Cookie の `session_id` から認可セッションを取得する
+- Cookie（`AuthRequestSessionId`/`session_id`）、`x-session-id`、フォーム `session_id` の順で認可セッションを取得する
 - 認可セッションに紐づくクライアントの規約設定と要求 scope を取得する
 - 同意画面の描画に必要なデータを返却する

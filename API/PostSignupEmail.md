@@ -10,7 +10,8 @@
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| Cookie | ○ | `(^|;\s*)session_id=[A-Fa-f0-9]{32}($|;)` | 認可フロー継続用のセッションID。 |
+| Cookie | - | `(^|;\s*)(AuthRequestSessionId|session_id)=[A-Fa-f0-9]{32}($|;)` | 認可フロー継続用のセッションID。 |
+| x-session-id | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替で認可セッションIDを指定する場合に利用。 |
 | Content-Type | ○ | - | `application/x-www-form-urlencoded` |
 
 ### Query
@@ -21,6 +22,7 @@
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
+| session_id | - | `^[A-Fa-f0-9]{32}$` | 認可フロー継続用のセッションID。Cookie/ヘッダー未指定時の代替入力。 |
 | email | ○ | `^.+@.+$` | 登録対象のメールアドレス。 |
 
 ## Response
@@ -49,7 +51,7 @@
 
 ## Processing
 
-1. Cookie、フォーム、またはヘッダーから認可セッションIDを取得する。
+1. Cookie（`AuthRequestSessionId`/`session_id`）、フォーム、またはヘッダーから認可セッションIDを取得する。
 2. 認可セッションを取得し、有効期限とクライアントを検証する。
 3. メールアドレス形式と利用可否を検証する。
 4. 認証コードを発行し、`signup_session_id` に紐づけてRedisへ保存する。

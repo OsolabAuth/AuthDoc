@@ -1,7 +1,7 @@
 # ログアウトフロー
 
 ## ■ フロー概要
-Auth Session / Access Token / ID Token失効フロー
+Auth Session / Access Token失効フロー
 
 ## ■ シーケンス
 
@@ -16,7 +16,7 @@ database mdb
 User -> Client : ログアウト開始
 
 group ログアウトエンドポイント
-    Client -> auth : POST(/Logout)
+    Client -> auth : POST(/logout)
     note right
         Header
             Cookie.AuthSessionId : ログインセッションID
@@ -49,16 +49,16 @@ group ログアウトエンドポイント
         end
 
         group Cookie削除
-            auth -> auth : Cookie.AuthSessionId と Cookie.session_id を削除
+            auth -> auth : Cookie.AuthSessionId / Cookie.AuthRequestSessionId / Cookie.session_id を削除
         end
 
         opt Authorizationヘッダーが存在する場合
-            auth -> auth : Bearerアクセストークンからtoken_id抽出
+            auth -> auth : Bearerアクセストークンを検証
 
             group アクセストークン取得
                 auth -> mdb : Get:DB3
                 note right
-                    key: token_id
+                    key: access_token
                 end note
                 auth <-- mdb : アクセストークン情報
             end
@@ -66,48 +66,10 @@ group ログアウトエンドポイント
             group アクセストークン削除
                 auth -> mdb : Delete:DB3
                 note right
-                    key: token_id
+                    key: access_token
                 end note
                 auth <-- mdb
             end
-        end
-
-        group IDトークン失効登録
-            note over auth,mdb
-                jtiをブラックリスト登録
-            end note
-            auth -> mdb : Set:DB8
-            note right
-                Key
-                    id_token_jti
-                Value
-                    jti
-                    osolab_id
-                    revoked_at: 現在時刻
-                    expires_at: id_token.expまで
-                    reason: logout
-            end note
-            auth <-- mdb
-        end
-
-        alt logout_all = true の場合
-
-            group 全セッション失効日時登録
-                auth -> mdb : Set:DB9
-                note right
-                    Key
-                        osolab_id
-                    Value
-                        revoked_after: 現在時刻
-                        reason: logout_all
-                end note
-                auth <-- mdb
-            end
-
-            note over auth,mdb
-                user単位で全Auth Session / Access Token / ID Tokenを無効化
-            end note
-
         end
 
         User <- auth : ログアウト完了画面 or Clientへリダイレクト

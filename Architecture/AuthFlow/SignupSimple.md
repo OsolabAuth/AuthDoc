@@ -36,7 +36,7 @@ group 認可エンドポイント
     group #PaleGreen 認可セッション発行
         note over auth,mdb
             ①認可エンドポイントのリクエスト内容をRedisに保持
-            ②セッションIDをCookieのauth_request_session_idに登録
+            ②セッションIDをCookieのAuthRequestSessionIdに登録(互換でsession_idも保持)
         end note
     end
     User <- auth : 『ログイン』画面(GET portal.osolab-auth.jp/login)にリダイレクト依頼
@@ -93,17 +93,17 @@ group 認可エンドポイント
         end
         group #PaleGreen 認可リクエストの再実行 
             note over auth,mdb
-                ①auth_request_session_idの検証
+                ①AuthRequestSessionIdの検証
                 ②認可エンドポイントの処理を再実行
                 ③新規アカウントの為、必ず同意チェックで引っかかる
             end note
         end
     User <- auth : 規約同意画面にリダイレクト依頼
     User -> portal : GET(/terms)
-    portal -> auth : GET(client/terms)
+    portal -> auth : POST(/terms/list)
         group #PaleGreen 同意情報を取得
             note over auth,mdb
-                ①auth_request_session_idの検証
+                ①AuthRequestSessionIdの検証
                 ②セッションに紐づくクライアントの検証
                 ③クライアントに紐づく規約を取得
                 ④セッションに登録されたスコープ情報をRDBから取得
@@ -115,7 +115,7 @@ group 認可エンドポイント
     portal -> auth : POST(/terms)
         group #PaleGreen 同意処理
             note over auth,mdb
-                ①auth_request_session_idの検証
+                ①AuthRequestSessionIdの検証
                 ②セッションに紐づくクライアントの検証
                 ③クライアントに紐づく規約を取得
                 ④セッションに登録されたスコープ情報をRDBから取得
@@ -124,7 +124,7 @@ group 認可エンドポイント
         end
         group #PaleGreen 認可リクエストの再実行 
             note over auth,mdb
-                ①auth_request_session_idの検証
+                ①AuthRequestSessionIdの検証
                 ②認可エンドポイントの処理を再実行
                 ③新規アカウントの為、必ず同意チェックで引っかかる
             end note
@@ -140,7 +140,7 @@ group トークンエンドポイント
         Header
             x-flow-type: AuthorizationCode
             Content-Type : application/x-www-form-urlencoded
-            Authorization : Basic Base64(クライアントID:クライアントシークレット)
+            Authorization : Basic Base64(クライアントID:クライアントシークレット) (Basic認証利用時のみ)
         Body
             grant_type=authorization_code
             code_verifier=code_verifier

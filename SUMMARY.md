@@ -17,6 +17,9 @@
 * [規約同意](API/PostTermConsent.md)
 * [トークンエンドポイント](API/PostToken.md)
 * [アカウント登録](API/signup.md)
+* [ログイン状態取得](API/GetLoginStatus.md)
+* [認証コード再送](API/PostSignupResend.md)
+* [トークン失効](API/PostRevoke.md)
 
 ## Architecture
 * [認証フロー](Architecture/AuthFlow/AuthorizationCodeFlow.md)

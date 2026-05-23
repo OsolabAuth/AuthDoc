@@ -10,7 +10,8 @@
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
-| Cookie | ○ | `(^|;\s*)signup_session_id=[A-Fa-f0-9]{32}($|;)` | 認証コード検証済みのサインアップセッションID。 |
+| Cookie | - | `(^|;\s*)signup_session_id=[A-Fa-f0-9]{32}($|;)` | 認証コード検証済みのサインアップセッションID。 |
+| x-signup-session-id | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替で `signup_session_id` を指定する場合に利用。 |
 | Content-Type | ○ | - | `application/x-www-form-urlencoded` |
 
 ### Query
@@ -21,6 +22,7 @@
 
 | Name | Required | Regex | Description |
 | :--- | :---: | :--- | :--- |
+| signup_session_id | - | `^[A-Fa-f0-9]{32}$` | Cookie/ヘッダー未指定時の代替入力。 |
 | password | ○ | `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,64}$` | 登録するパスワード。サーバ側でArgon2idハッシュ化して保存する。 |
 
 ## Response
@@ -52,7 +54,7 @@
 
 ## Processing
 
-1. `signup_session_id` と `password` を検証する。
+1. `signup_session_id`（フォーム/ヘッダー/Cookie）と `password` を検証する。
 2. サインアップセッションを取得し、認証コード検証済みであることを確認する。
 3. メールアドレス重複を再確認し、ユーザーを本登録（有効化）する。
 4. ログインセッションを作成し、Cookieへ保存する。
