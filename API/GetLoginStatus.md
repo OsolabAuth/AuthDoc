@@ -1,47 +1,87 @@
-# ログイン状態取得
+---
 
-## Endpoint
+description: 認証セッションCookieからログイン状態を取得する
 
-`GET /login/status`
+---
 
-## Request
+# ログイン状態取得 <!-- omit in toc -->
 
-### Header
+## 1. API概要
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| Cookie | - | `(^|;\s*)(AuthSessionId|session_id)=[A-Fa-f0-9]{32}($|;)` | ログインセッション判定対象。 |
+`AuthSessionId` Cookieの有無とRedis上の認証セッションを確認し、ログイン状態を返却する。
 
-### Query
+### 1.1. リクエスト
+
+#### 1.1.1. エンドポイント
+
+``` text
+GET /login/status
+```
+
+#### 1.1.2. リクエストヘッダ
+
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Cookie | 認証セッションCookie | string | - | - | - | `AuthSessionId` |
+
+#### 1.1.3. リクエストパラメータ
 
 なし
 
-### Body
+### 1.2. レスポンス
 
-なし
+#### 1.2.1. レスポンスヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/json` |
+| 2. | Cache-Control | キャッシュ制御 | string | - | ○ | `no-store` | - |
+| 3. | Pragma | キャッシュ制御 | string | - | ○ | `no-cache` | - |
 
-### Header
+#### 1.2.2. レスポンスパラメータ
 
-なし
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | response_code | レスポンスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000` |
+| 2. | logged_in | ログイン状態 | boolean | - | ○ | - | 認証セッションが有効な場合 `true` |
 
-### Body
+## 2. API詳細
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| response_code | string | 処理結果コード。 |
-| logged_in | boolean | ログイン状態。 |
+### 2.1. 処理内容
 
-## Response Code
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | Cookie取得 | `AuthSessionId` Cookieを取得 |
+| 2. | 認証セッション取得 | Cookieが存在する場合、Redisから認証セッションを取得 |
+| 3. | ログイン状態返却 | セッションが存在し復元できる場合は `logged_in=true`、それ以外は `false` |
 
-| Code | HTTP Status | Description |
-| :--- | :---: | :--- |
-| 00000 | 200 | 取得成功。 |
-| 90000 | 500 | 想定外のサーバエラー。 |
+### 2.2. シーケンス
 
-## Processing
+```plantuml
+@startuml
+participant UI
+box "AuthFoundation" #FAEBD7
+  participant API as LoginController
+  database Redis
+end box
 
-1. Cookie からログインセッションID（`AuthSessionId` 優先、互換で `session_id`）を取得する。
-2. セッションIDが空の場合は `logged_in=false` を返す。
-3. Redisのログインセッションを参照し、存在すれば `logged_in=true` を返す。
+UI -> API : GET /login/status
+API -> API : AuthSessionId Cookie取得
+alt Cookieなし
+  API -> UI : 200 logged_in=false
+else Cookieあり
+  API -> Redis : AuthSession取得
+  API -> UI : 200 logged_in=true/false
+end
+
+alt 例外
+  API -> UI : error, error_code, error_description
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

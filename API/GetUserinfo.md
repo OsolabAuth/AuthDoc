@@ -1,46 +1,93 @@
-# UserInfoエンドポイント
+---
 
-## ■ Endpoint
+description: アクセストークンを検証してスコープに応じたユーザー情報を返却する
+
+---
+
+# UserInfo取得 <!-- omit in toc -->
+
+## 1. API概要
+
+OAuth 2.0 Bearerアクセストークンを検証し、OIDC UserInfo Endpointとしてユーザーのクレーム情報を返却する。
+
+### 1.1. リクエスト
+
+#### 1.1.1. エンドポイント
+
+``` text
 GET /userinfo
+```
 
-## Request
+#### 1.1.2. リクエストヘッダ
 
-### ■ Header
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Authorization | アクセストークン | string | - | ○ | `Bearer {access_token}` | - |
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| Authorization | ○ | ^Bearer [A-Fa-f0-9]{16}_[A-Fa-f0-9]{32}_[0-9]{32}$ | アクセストークン |
+#### 1.1.3. リクエストパラメータ
 
-### ■ Query
 なし
 
-### ■ Body
-なし
+### 1.2. レスポンス
 
-## Response
+#### 1.2.1. レスポンスヘッダ
 
-### ■ Header
-なし
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/json` |
+| 2. | WWW-Authenticate | Bearerエラー | string | - | - | - | `invalid_token` の場合に返却 |
+| 3. | Cache-Control | キャッシュ制御 | string | - | ○ | `no-store` | - |
+| 4. | Pragma | キャッシュ制御 | string | - | ○ | `no-cache` | - |
 
-### ■ Body
+#### 1.2.2. レスポンスパラメータ
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| sub | String | ユーザー識別子 |
-| email | String | メールアドレス。`email` scope 付与時のみ |
-| name | String | 表示名。`profile` scope 付与時のみ |
-| picture | String | プロフィール画像URL。`profile` scope 付与時のみ |
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | sub | サブジェクト | string | 16 | ○ | `^[A-Fa-f0-9]{16}$` | Osolab ID |
+| 2. | email | メールアドレス | string | - | - | email | `email` スコープがある場合のみ |
+| 3. | email_verified | メール確認済み | boolean | - | - | - | `email` スコープがある場合のみ `true` |
+| 4. | 任意claim | ユーザー拡張情報 | string | - | - | - | `user_infos` の有効データを `data_key` 名で返却 |
 
-### ■ ResponseCode
+## 2. API詳細
 
-| Code | HttpStatusCode | Description |
-| :--- | :--- | :--- |
-| 00000 | 200 | OK |
-| 00001 | 400 | リクエストの内容が異常です |
-| 00008 | 401 | 認可がありません。 |
-| 90000 | 500 | ハンドルされていないエラーが発生しました |
+### 2.1. 処理内容
 
-## ■ 処理概要
-- Bearer アクセストークンを検証し、アクセストークン値をキーとしてトークン情報を取得する
-- scope に応じて返却可能なユーザー属性を抽出する
-- OpenID Connect UserInfo として返却する
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | Authorizationヘッダー確認 | Bearer形式であることを確認 |
+| 2. | アクセストークン取得 | Redisのアクセストークンセッションを取得 |
+| 3. | ユーザー取得 | ACTIVE状態のユーザーをRDBから取得 |
+| 4. | スコープ判定 | `email` スコープがある場合のみメール関連claimを含める |
+| 5. | 拡張claim取得 | `user_infos` の有効データをレスポンスに追加 |
+
+### 2.2. シーケンス
+
+```plantuml
+@startuml
+participant Client
+box "AuthFoundation" #FAEBD7
+  participant API as UserInfoController
+  database RDB
+  database Redis
+end box
+
+Client -> API : GET /userinfo
+API -> API : Authorization検証
+API -> Redis : AccessTokenSession取得
+API -> RDB : ACTIVEユーザー取得
+API -> RDB : user_infos取得
+API -> Client : 200 claims
+
+alt token不正
+  API -> Client : 401 invalid_token + WWW-Authenticate
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 401 | invalid_token | 00008 | アクセストークンが無効です |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

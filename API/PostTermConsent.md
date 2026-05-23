@@ -1,54 +1,103 @@
-# 規約同意
+---
 
-## ■ Endpoint
+description: 規約とスコープの同意結果を保存して認可処理を再開する
+
+---
+
+# 規約同意 <!-- omit in toc -->
+
+## 1. API概要
+
+認可セッションに紐づく利用規約と要求スコープへの同意結果を登録し、認可処理を再開して次の遷移先を返却する。
+
+### 1.1. リクエスト
+
+#### 1.1.1. エンドポイント
+
+``` text
 POST /terms
+```
 
-## Request
+#### 1.1.2. リクエストヘッダ
 
-### ■ Header
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/x-www-form-urlencoded` |
+| 2. | Cookie | 認可/認証セッションCookie | string | - | - | - | `AuthRequestSessionId`、`session_id`、`AuthSessionId` |
+| 3. | x-session-id | 認可セッションID | string | 32 | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替 |
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| Cookie | - | `(^|;\s*)(AuthRequestSessionId|session_id)=[A-Fa-f0-9]{32}($|;)` | 認可セッションIDを保持するCookie |
-| x-session-id | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替で認可セッションIDを指定する場合に利用 |
-| Content-Type | ○ | - | application/x-www-form-urlencoded |
+#### 1.1.3. リクエストパラメータ
 
-### ■ Query
-なし
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | session_id | 認可セッションID | string | 32 | - | `^[A-Fa-f0-9]{32}$` | Cookie/ヘッダー未指定時の代替 |
+| 2. | accepted | 同意結果 | string | - | ○ | `^(true&#124;false&#124;on)$` | `true` または `on` を同意扱い |
+| 3. | term_ids | 同意規約ID | array(string) | - | - | - | 複数指定時は同名項目を繰り返す |
 
-### ■ Body
+### 1.2. レスポンス
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| session_id | - | `^[A-Fa-f0-9]{32}$` | 認可セッションID。Cookie/ヘッダー未指定時の代替入力 |
-| accepted | ○ | ^(true\|false\|on)$ | 規約同意可否 |
-| term_ids | ○ | - | 同意対象規約ID。複数時は同名項目を繰り返す |
+#### 1.2.1. レスポンスヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Location | 遷移先URL | string | - | ○ | URI | 同意時は `code` と `state`、拒否時は `error=access_denied` と `state` を付与 |
+| 2. | Cache-Control | キャッシュ制御 | string | - | ○ | `no-store` | - |
+| 3. | Pragma | キャッシュ制御 | string | - | ○ | `no-cache` | - |
 
-### ■ Header
+#### 1.2.2. レスポンスパラメータ
 
-| Name | Description |
-| :--- | :--- |
-| Location | 認可コード付与後のリダイレクト先 |
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | result | 処理結果 | string | - | ○ | `redirect` | - |
+| 2. | error | OAuthエラー | string | - | - | `access_denied` | 同意拒否時のみ |
 
-### ■ Body
+## 2. API詳細
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| result | String | 処理結果。`redirect` |
-| error | String | 同意拒否時のエラーコード。`access_denied` |
+### 2.1. 処理内容
 
-### ■ ResponseCode
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | リクエストパラメータ確認 | セッションID、同意結果を検証 |
+| 2. | 認可セッション取得 | Redisから認可セッションを取得。存在しない場合は画面期限切れ |
+| 3. | 拒否処理 | `accepted=false` の場合、`redirect_uri` に `error=access_denied` と `state` を付与 |
+| 4. | 必須規約確認 | 必須規約がすべて `term_ids` に含まれていることを確認 |
+| 5. | 同意保存 | 規約同意履歴とスコープ同意情報を保存 |
+| 6. | 認可再実行 | 認証セッションを用いて認可処理を再開し、認可コードまたは次画面URLを返却 |
 
-| Code | HttpStatusCode | Description |
-| :--- | :--- | :--- |
-| 00001 | 400 | リクエストの内容が異常です |
-| 00003 | 400 | 画面の有効期限が切れました。再度ログインをやり直してください。 |
-| 90000 | 500 | ハンドルされていないエラーが発生しました |
+### 2.2. シーケンス
 
-## ■ 処理概要
-- Cookie（`AuthRequestSessionId`/`session_id`）、`x-session-id`、フォーム `session_id` の順で認可セッションを取得する
-- 最新規約に対する同意情報を登録する
-- 同意済みの場合は認可コードを発行し、`redirect_uri` に `code` と `state` を付与してリダイレクトする
-- 拒否時は `error=access_denied` を付与してリダイレクトする
+```plantuml
+@startuml
+participant UI
+box "AuthFoundation" #FAEBD7
+  participant API as TermController
+  participant Service as AuthorizeExecutionService
+  database RDB
+  database Redis
+end box
+
+UI -> API : POST /terms
+API -> API : 入力検証
+API -> Redis : AuthRequestSession取得
+alt accepted=false
+  API -> UI : 200 + Location(error=access_denied)
+else accepted=true
+  API -> RDB : 必須規約確認/同意保存
+  API -> Service : TryExecuteFromSessionAsync()
+  Service -> Redis : 認可処理再開
+  API -> UI : 200 + Location
+end
+
+alt エラー
+  API -> UI : error, error_code, error_description
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 400 | invalid_request | 00003 | 画面の有効期限が切れました |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

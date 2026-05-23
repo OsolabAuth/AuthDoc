@@ -1,62 +1,122 @@
-# 認可エンドポイント
+---
 
-## ■ Endpoint
+description: OIDC Authorization Code + PKCE の認可リクエストを処理する
+
+---
+
+# 認可 <!-- omit in toc -->
+
+## 1. API概要
+
+OIDC Authorization Code + PKCE フローの認可リクエストを検証し、ログイン画面、同意画面、またはクライアントの `redirect_uri` へ遷移させる。
+
+### 1.1. リクエスト
+
+#### 1.1.1. エンドポイント
+
+``` text
 GET /authorize
+```
 
-## Request
+#### 1.1.2. リクエストヘッダ
 
-### ■ Header
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| x-auth-ui-session-mode | - | ^body$ | `body` 指定時は 302 リダイレクトの代わりに JSON Body (`redirect_url`, `session_id`) を返す |
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | x-auth-ui-response-mode | JSON遷移先返却モード | string | 4 | - | `^json$` | `json` 指定時は302ではなくJSONで遷移先URLを返却 |
+| 2. | Cookie | 認証セッションCookie | string | - | - | - | `AuthSessionId` が存在する場合はログイン済みとして扱う |
 
-### ■ Query
+#### 1.1.3. リクエストパラメータ
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| response_type | ○ | ^code$ | 認可コードフロー固定値 |
-| client_id | ○ | ^[0-9]{32}$ | クライアント識別子 |
-| redirect_uri | ○ | ^(https://.+&#124;http://(localhost&#124;osolab-[A-Za-z0-9-]+-local)(:[0-9]+)?(/.*)?)$ | 認可結果のリダイレクト先。通常は `https`、検証用途の `localhost` または `osolab-*-local` のみ `http` を許容 |
-| state | ○ | ^.{1,255}$ | CSRF対策用のクライアント状態値 |
-| scope | ○ | ^[A-Za-z0-9_ ]+$ | 要求するスコープの空白区切り文字列 |
-| code_challenge_method | ○ | ^S256$ | PKCE チャレンジ方式 |
-| code_challenge | ○ | ^[A-Za-z0-9._~-]{43,128}$ | PKCE コードチャレンジ |
-| nonce | ○ | ^.{1,255}$ | IDトークン再生対策用ノンス |
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | response_type | レスポンスタイプ | string | 4 | ○ | `^code$` | 認可コードフロー固定値 |
+| 2. | client_id | クライアントID | string | 32 | ○ | `^[0-9]{32}$` | - |
+| 3. | redirect_uri | リダイレクトURI | string | - | ○ | `https://...` または許可済みローカルHTTP | クライアント登録値と完全一致 |
+| 4. | state | state | string | 1-255 | ○ | `^.{1,255}$` | CSRF対策用 |
+| 5. | scope | スコープ | string | - | ○ | `^[A-Za-z0-9_ ]+$` | 空白区切り |
+| 6. | code_challenge_method | PKCE方式 | string | 4 | ○ | `^S256$` | S256固定 |
+| 7. | code_challenge | PKCEチャレンジ | string | 43-128 | ○ | `^[A-Za-z0-9._~-]{43,128}$` | - |
+| 8. | nonce | nonce | string | 1-255 | ○ | `^.{1,255}$` | IDトークン再生対策 |
 
-### ■ Body
-なし
+### 1.2. レスポンス
 
-## Response
+#### 1.2.1. レスポンスヘッダ
 
-### ■ Header
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Location | 遷移先URL | string | - | - | URI | 通常モード時のみ。ログイン画面、同意画面、または `redirect_uri` |
+| 2. | Set-Cookie | 認可セッションCookie | string | - | - | - | 認可セッション発行時のみ `AuthRequestSessionId` と互換用 `session_id` を設定 |
+| 3. | Cache-Control | キャッシュ制御 | string | - | ○ | `no-store` | - |
+| 4. | Pragma | キャッシュ制御 | string | - | ○ | `no-cache` | - |
 
-| Name | Description |
-| :--- | :--- |
-| Location | リダイレクトレスポンス時のみ。ログイン画面、同意画面、または `redirect_uri` |
-| Set-Cookie | 認可セッション発行時に `AuthRequestSessionId` を設定（互換として `session_id` も設定） |
+#### 1.2.2. レスポンスパラメータ
 
-### ■ Query
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| code | String | 正常時のみ認可コードを設定 |
-| state | String | 正常時のみリクエストのstateを設定 |
-| error | String | エラー時のみ |
-| error\_description | String | エラー時のみ。エラー内容 |
+`x-auth-ui-response-mode=json` 指定時のみJSONを返却する。認可セッションIDはレスポンスBodyに含めず、Cookieで引き継ぐ。
 
-### ■ ResponseCode
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | result | 処理結果 | string | - | ○ | `redirect` | - |
+| 2. | redirect_url | 遷移先URL | string | - | ○ | URI | ログイン画面、同意画面、またはクライアントの `redirect_uri` |
+| 3. | response_code | レスポンスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000` |
+| 4. | message | メッセージ | string | - | ○ | - | 正常時は空文字 |
 
-| Code | HttpStatusCode | Description |
-| :--- | :--- | :--- |
-| 00001 | 400 | リクエストの内容が異常です |
-| 00002 | 400 | 不正なクライアント。`client_id` が未登録または無効 |
-| 00005 | 400 | リダイレクトURIが不正 |
+## 2. API詳細
 
+### 2.1. 処理内容
 
-## ■ 処理概要
-- 認可リクエストを検証する
-- Auth Session が有効なら規約・scope 同意状態を確認する
-- 未ログイン時は認可セッションを発行し、`Set-Cookie` で `AuthRequestSessionId`（互換で `session_id`）を払い出して `GET /login` に遷移させる
-- Portal UI 方式では認可セッションIDを URL query に付与せず、Cookieで引き継ぐ
-- 同意済みなら認可コードを発行して `redirect_uri` へリダイレクトする
-- 未同意なら規約同意画面に遷移させる
-- 検証エラー時はJSON Body付きで400を返却する
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | リクエストパラメータ確認 | 必須項目または形式が不正な場合は `invalid_request` |
+| 2. | クライアント検証 | クライアントIDとリダイレクトURIを検証。存在しない場合は `unauthorized_client` |
+| 3. | 要求スコープ検証 | クライアント必須スコープが要求スコープに含まれない場合は `invalid_scope` |
+| 4. | 認証セッション確認 | `AuthSessionId` Cookieが有効な場合はログイン済みとして扱う |
+| 5. | 同意状態確認 | 必須規約と要求スコープへの同意状態を確認 |
+| 6. | 認可コード発行 | ログイン済みかつ同意済みの場合、認可コードをRedisへ保存し `redirect_uri` に `code` と `state` を付与 |
+| 7. | 認可セッション発行 | 未ログインまたは未同意の場合、認可セッションをRedisへ保存し、ログイン画面または同意画面へ遷移 |
+
+### 2.2. シーケンス
+
+```plantuml
+@startuml
+participant Client
+box "AuthFoundation" #FAEBD7
+  participant API as AuthorizeController
+  participant Service as AuthorizeExecutionService
+  database RDB
+  database Redis
+end box
+
+Client -> API : GET /authorize
+API -> API : リクエスト検証
+API -> RDB : クライアント/redirect_uri検証
+API -> Service : ExecuteAsync(認可セッション, loginSessionId)
+Service -> RDB : 必須スコープ取得
+Service -> Redis : AuthSession取得
+alt 未ログイン
+  Service -> Redis : 認可セッション保存
+  API -> Client : 302 or JSON (login URL)
+else ログイン済み・未同意
+  Service -> RDB : 規約/スコープ同意確認
+  Service -> Redis : 認可セッション保存
+  API -> Client : 302 or JSON (terms URL)
+else ログイン済み・同意済み
+  Service -> Redis : 認可コード保存
+  Service -> Redis : 認可セッション削除
+  API -> Client : 302 or JSON (redirect_uri?code&state)
+end
+
+alt エラー
+  API -> Client : error, error_code, error_description
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 400 | unauthorized_client | 00002 | 不正なクライアント |
+| 400 | invalid_request | 00005 | リダイレクトURIが不正 |
+| 400 | invalid_scope | 00009 | スコープが不正 |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

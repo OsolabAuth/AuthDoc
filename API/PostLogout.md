@@ -1,59 +1,94 @@
-# ログアウト
+---
 
-## Endpoint
+description: 認証セッションCookieと必要に応じてアクセストークンを削除する
 
-`POST /logout`
+---
 
-## Request
+# ログアウト <!-- omit in toc -->
 
-### Header
+## 1. API概要
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| Cookie | - | `(^|;\s*)(AuthSessionId|AuthRequestSessionId|session_id)=[A-Fa-f0-9]{32}($|;)` | 削除対象のセッションCookie。未指定でも冪等に成功する。 |
-| Authorization | - | `^Bearer [A-Za-z0-9._~-]{20,}$` | 削除対象のアクセストークン。指定された場合はアクセストークンセッションも削除する。 |
-| Content-Type | - | - | 省略可。指定する場合は `application/x-www-form-urlencoded` |
+認証セッションCookieを破棄し、Redis上の認証セッションを削除する。Bearerアクセストークンが指定された場合はアクセストークンセッションも削除する。
 
-### Query
+### 1.1. リクエスト
 
-なし
+#### 1.1.1. エンドポイント
 
-### Body
+``` text
+POST /logout
+```
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| logout_all | - | `^(true|false)$` | 全端末ログアウト要求フラグ。未指定時は `false` 扱い。現行実装では入力値を検証し、レスポンスへ返す。 |
+#### 1.1.2. リクエストヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | - | - | 指定する場合は `application/x-www-form-urlencoded` |
+| 2. | Cookie | セッションCookie | string | - | - | - | `AuthSessionId`、`AuthRequestSessionId`、`session_id` |
+| 3. | Authorization | アクセストークン | string | - | - | `Bearer {access_token}` | 指定時はアクセストークンセッションも削除 |
 
-### Header
+#### 1.1.3. リクエストパラメータ
 
-| Name | Description |
-| :--- | :--- |
-| Set-Cookie | `AuthSessionId`、`AuthRequestSessionId`、`session_id` を期限切れにして削除する。 |
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | logout_all | 全端末ログアウト要求 | string | - | - | `^(true&#124;false)$` | 現行実装では入力検証しレスポンスへ返却。未指定時は `false` |
 
-### Body
+### 1.2. レスポンス
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| response_code | string | 処理結果コード。 |
-| result | string | `logged_out` または `already_logged_out`。 |
-| logout_all | boolean | リクエストで指定された全端末ログアウト要求フラグ。 |
+#### 1.2.1. レスポンスヘッダ
 
-## Response Code
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Set-Cookie | Cookie削除 | string | - | ○ | - | `AuthSessionId`、`AuthRequestSessionId`、`session_id` を期限切れにする |
+| 2. | Cache-Control | キャッシュ制御 | string | - | ○ | `no-store` | - |
+| 3. | Pragma | キャッシュ制御 | string | - | ○ | `no-cache` | - |
 
-| Code | HTTP Status | Description |
-| :--- | :---: | :--- |
-| 00000 | 200 | ログアウト成功。セッション未存在の場合も冪等に成功する。 |
-| 00001 | 400 | リクエスト形式、`logout_all`、または `Authorization` ヘッダーが不正。 |
-| 90000 | 500 | 想定外のサーバエラー。 |
+#### 1.2.2. レスポンスパラメータ
 
-## Processing
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | response_code | レスポンスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000` |
+| 2. | result | 処理結果 | string | - | ○ | `logged_out` / `already_logged_out` | 有効な認証セッションがあった場合は `logged_out` |
+| 3. | logout_all | 全端末ログアウト要求 | boolean | - | ○ | - | リクエスト値 |
 
-1. `Content-Type` が指定されている場合は `application/x-www-form-urlencoded` であることを検証する。
-2. `logout_all` が指定されている場合は `true` または `false` であることを検証する。
-3. `Authorization` ヘッダーが指定されている場合はBearer形式を検証する。
-4. Cookieに認証セッションIDが存在する場合は、Redis上の認証セッションを削除する。
-5. Bearerトークンが指定されている場合は、アクセストークンセッションを削除する。
-6. `AuthSessionId`、`AuthRequestSessionId`、`session_id` のCookieを削除する。
-7. セッション削除結果と `logout_all` を返す。
+## 2. API詳細
+
+### 2.1. 処理内容
+
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | リクエストパラメータ確認 | Content-Typeと任意の `logout_all` を検証 |
+| 2. | 認証セッション削除 | `AuthSessionId` Cookieがある場合、Redisの認証セッションを削除 |
+| 3. | アクセストークン削除 | Authorization Bearerが指定された場合、Redisのアクセストークンセッションを削除 |
+| 4. | Cookie削除 | `AuthSessionId`、`AuthRequestSessionId`、`session_id` を削除 |
+| 5. | 結果返却 | セッション有無に応じて `logged_out` または `already_logged_out` を返却 |
+
+### 2.2. シーケンス
+
+```plantuml
+@startuml
+participant UI
+box "AuthFoundation" #FAEBD7
+  participant API as LogoutController
+  database Redis
+end box
+
+UI -> API : POST /logout
+API -> API : 入力検証
+API -> Redis : AuthSession取得
+alt 認証セッションあり
+  API -> Redis : AuthSession削除
+end
+alt Bearer指定あり
+  API -> Redis : AccessTokenSession削除
+end
+API -> API : Cookie削除
+API -> UI : 200 logged_out/already_logged_out
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

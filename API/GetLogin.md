@@ -1,46 +1,77 @@
-# ログイン画面表示
+---
 
-## ■ Endpoint
+description: ログイン画面を表示する
+
+---
+
+# ログイン画面表示 <!-- omit in toc -->
+
+## 1. API概要
+
+認可フロー中のユーザーにメールアドレスとパスワードを入力するログイン画面を表示する。認可セッションIDはURLクエリではなくCookieで引き継ぐ。
+
+### 1.1. リクエスト
+
+#### 1.1.1. エンドポイント
+
+``` text
 GET /login
+```
 
-## Request
+#### 1.1.2. リクエストヘッダ
 
-### ■ Header
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Cookie | 認可セッションCookie | string | - | - | - | `AuthRequestSessionId` または `session_id` |
+
+#### 1.1.3. リクエストパラメータ
+
 なし
 
-### ■ Query
-なし
+### 1.2. レスポンス
 
-### ■ Body
-なし
+#### 1.2.1. レスポンスヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `text/html; charset=UTF-8` |
 
-### ■ Header
+#### 1.2.2. レスポンスパラメータ
 
-| Name | Description |
-| :--- | :--- |
-| Content-Type | `text/html; charset=UTF-8` |
+HTMLを返却する。
 
-### ■ Body
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | email | メールアドレス入力欄 | html | - | ○ | - | `POST /login` の `email` として送信 |
+| 2. | password | パスワード入力欄 | html | - | ○ | - | `POST /login` の `password` として送信 |
+| 3. | signup link | 新規登録リンク | html | - | ○ | - | `/signup` へ遷移 |
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| response_code | String | エラーの場合は必須。レスポンスコード |
-| html | String | メールアドレス、パスワード入力欄とログイン送信フォームを含むHTML |
+## 2. API詳細
 
-### ■ ResponseCode
+### 2.1. 処理内容
 
-| Code | HttpStatusCode | Description |
-| :--- | :--- | :--- |
-| 00000 | 200 | OK |
-| 00001 | 400 | リクエストの内容が異常です |
-| 90000 | 500 | ハンドルされていないエラーが発生しました |
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | 画面表示 | ログインフォームを表示 |
+| 2. | 認可セッション引き継ぎ | `AuthRequestSessionId` Cookieを使用し、URLにはセッションIDを表示しない |
+| 3. | ログイン実行 | ログインボタン押下時に `POST /login` を実行 |
+| 4. | 新規登録遷移 | 新規登録リンク押下時に `/signup` へ遷移 |
 
-## ■ 処理概要
-- Portal UI では認可セッションIDをURL queryで受け取らない。`/authorize` の `Set-Cookie` で付与された `AuthRequestSessionId`（互換で `session_id`）を利用する
-- セッションが無い場合でも認証画面のみのログインが可能のため、画面は返却する
-- メールアドレスとパスワードを入力するための画面を返却する
-- ログインボタン押下時に `POST /login` を実行する
-- `POST /login` でエラーコード `00006` が返却された場合は、「ログインに成功しましたが、認証の有効期限が切れました。アプリケーションに戻り、再度お試しください。」のメッセージを表示する
-- 新規登録リンク押下時も認可セッションIDをURLに付与せず、Cookieで維持する
+### 2.2. シーケンス
+
+```plantuml
+@startuml
+participant Browser
+participant UI as Auth UI
+
+Browser -> UI : GET /login
+UI -> Browser : 200 HTML
+Browser -> UI : POST /login
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

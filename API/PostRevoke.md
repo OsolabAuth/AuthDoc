@@ -1,58 +1,102 @@
-# トークン失効
+---
 
-## Endpoint
+description: アクセストークンまたはリフレッシュトークンを失効する
 
-`POST /revoke`
+---
 
-## Request
+# トークン失効 <!-- omit in toc -->
 
-### Header
+## 1. API概要
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| Authorization | - | `^Basic .+$` | クライアント認証（Base64(client_id:client_secret)）。 |
-| Content-Type | ○ | - | `application/x-www-form-urlencoded` |
+OAuth 2.0 Token Revocation Endpointとして、指定されたアクセストークンまたはリフレッシュトークンをRedisから削除する。トークンが存在しない場合も冪等に成功を返す。
 
-### Query
+### 1.1. リクエスト
 
-なし
+#### 1.1.1. エンドポイント
 
-### Body
+``` text
+POST /revoke
+POST /api/auth/revoke
+```
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| token | ○ | `^[A-Za-z0-9._~-]{20,}$` | 失効対象トークン。 |
-| token_type | - | `^(access_token|refresh_token)$` | トークン種別。`token_type_hint` でも指定可。 |
-| token_type_hint | - | `^(access_token|refresh_token)$` | `token_type` 未指定時の代替入力。 |
-| client_id | - | `^[0-9]{32}$` | Basic認証未指定時に必須。 |
+#### 1.1.2. リクエストヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/x-www-form-urlencoded` |
+| 2. | Authorization | クライアントBasic認証 | string | - | - | `^Basic .+$` | Confidential clientの場合に指定 |
 
-### Header
+#### 1.1.3. リクエストパラメータ
 
-なし
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | token | 失効対象トークン | string | 20以上 | ○ | `^[A-Za-z0-9._~-]{20,}$` | - |
+| 2. | token_type | トークン種別 | string | - | ○ | `^(access_token&#124;refresh_token)$` | 未指定時は `token_type_hint` を参照 |
+| 3. | token_type_hint | トークン種別ヒント | string | - | - | `^(access_token&#124;refresh_token)$` | `token_type` の代替 |
+| 4. | client_id | クライアントID | string | 32 | - | `^[0-9]{32}$` | Basic認証未指定時は必須 |
 
-### Body
+### 1.2. レスポンス
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| response_code | string | 処理結果コード。 |
-| result | string | `revoked` 固定。 |
+#### 1.2.1. レスポンスヘッダ
 
-## Response Code
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/json` |
+| 2. | Cache-Control | キャッシュ制御 | string | - | ○ | `no-store` | - |
+| 3. | Pragma | キャッシュ制御 | string | - | ○ | `no-cache` | - |
 
-| Code | HTTP Status | Description |
-| :--- | :---: | :--- |
-| 00000 | 200 | 失効成功（対象トークン不存在でも冪等に成功）。 |
-| 00001 | 400 | 入力形式またはトークン種別が不正。 |
-| 00002 | 400 | クライアント認証失敗。 |
-| 90000 | 500 | 想定外のサーバエラー。 |
+#### 1.2.2. レスポンスパラメータ
 
-## Processing
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | response_code | レスポンスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000` |
+| 2. | result | 処理結果 | string | - | ○ | `revoked` | - |
 
-1. `token` と `token_type`（または `token_type_hint`）を検証する。
-2. Basic認証がある場合は `client_id` / `client_secret` を検証する。
-3. Basic認証がない場合は `client_id` を検証する。
-4. `token_type` に応じて該当Redisセッションを探索する。
-5. トークンが存在し、かつ `client_id` が一致する場合のみ削除する。
-6. 存在しない場合もエラーにせず `revoked` を返す。
+## 2. API詳細
+
+### 2.1. 処理内容
+
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | リクエストパラメータ確認 | Content-Type、token、token_type、クライアント認証情報を検証 |
+| 2. | クライアント認証 | Basic認証または `client_id` を検証 |
+| 3. | アクセストークン失効 | `token_type=access_token` の場合、クライアント一致時のみRedisから削除 |
+| 4. | リフレッシュトークン失効 | `token_type=refresh_token` の場合、クライアント一致時のみRedisから削除 |
+| 5. | 冪等応答 | トークン未存在、またはクライアント不一致の場合も成功として返却 |
+
+### 2.2. シーケンス
+
+```plantuml
+@startuml
+participant Client
+box "AuthFoundation" #FAEBD7
+  participant API as RevokeController
+  database RDB
+  database Redis
+end box
+
+Client -> API : POST /revoke
+API -> API : 入力検証
+API -> RDB : クライアント認証
+alt access_token
+  API -> Redis : AccessTokenSession取得
+  API -> Redis : クライアント一致時削除
+else refresh_token
+  API -> Redis : RefreshTokenSession取得
+  API -> Redis : クライアント一致時削除
+end
+API -> Client : 200 revoked
+
+alt エラー
+  API -> Client : OAuth error
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 400 | invalid_client | 00002 | クライアント認証に失敗しました |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

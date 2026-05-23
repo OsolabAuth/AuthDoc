@@ -1,77 +1,121 @@
-# トークンエンドポイント
+---
 
-## ■ Endpoint
+description: 認可コードまたはリフレッシュトークンを検証してトークンを発行する
+
+---
+
+# トークン発行 <!-- omit in toc -->
+
+## 1. API概要
+
+OAuth 2.0 Token Endpointとして、認可コードグラントまたはリフレッシュトークングラントを処理し、アクセストークン、リフレッシュトークン、IDトークンを発行する。
+
+### 1.1. リクエスト
+
+#### 1.1.1. エンドポイント
+
+``` text
 POST /token
+POST /api/auth/token
+```
 
-## Request
+#### 1.1.2. リクエストヘッダ
 
-### ■ Header
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/x-www-form-urlencoded` |
+| 2. | x-flow-type | フロー種別 | string | 17 | ○ | `^AuthorizationCode$` | Authorization Code Flow固定 |
+| 3. | Authorization | クライアントBasic認証 | string | - | - | `^Basic .+$` | Confidential clientの場合に指定。`Base64(client_id:client_secret)` |
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| x-flow-type | ○ | ^AuthorizationCode$ | Authorization Code Flow 固定値 |
-| Content-Type | ○ | - | application/x-www-form-urlencoded |
-| Authorization | - | ^Basic .+$ | Basic認証を指定する場合に利用。Base64(クライアントID:クライアントシークレット) |
+#### 1.1.3. リクエストパラメータ
 
-### ■ Query
-なし
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | grant_type | グラント種別 | string | - | ○ | `^(authorization_code&#124;refresh_token)$` | - |
+| 2. | client_id | クライアントID | string | 32 | - | `^[0-9]{32}$` | Basic認証未指定時は必須 |
+| 3. | code | 認可コード | string | 20以上 | - | `^[A-Za-z0-9._~-]{20,}$` | `grant_type=authorization_code` の場合は必須 |
+| 4. | code_verifier | PKCE verifier | string | 43-128 | - | `^[A-Za-z0-9._~-]{43,128}$` | `grant_type=authorization_code` の場合は必須 |
+| 5. | redirect_uri | リダイレクトURI | string | - | - | `https://...` または許可済みローカルHTTP | `grant_type=authorization_code` の場合は必須。認可要求時と完全一致 |
+| 6. | refresh_token | リフレッシュトークン | string | 20以上 | - | `^[A-Za-z0-9._~-]{20,}$` | `grant_type=refresh_token` の場合は必須 |
 
-### ■ Body
+### 1.2. レスポンス
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| grant_type | ○ | ^(authorization_code\|refresh_token)$ | トークン発行方式。`authorization_code` または `refresh_token` |
-| client_id | - | ^[0-9]{32}$ | Publicクライアントの場合のみ必須 |
-| code | - | ^[A-Za-z0-9._~-]{20,}$ | `grant_type=authorization_code` の場合に必須 |
-| code_verifier | - | ^[A-Za-z0-9._~-]{43,128}$ | `grant_type=authorization_code` の場合に必須 |
-| redirect_uri | - | ^(https://.+\|http://(localhost\|osolab-[A-Za-z0-9-]+-local)(:[0-9]+)?(/.*)?)$ | `grant_type=authorization_code` の場合に必須。認可要求時と同一のURIを要求 |
-| refresh_token | - | ^[A-Za-z0-9._~-]{20,}$ | `grant_type=refresh_token` の場合に必須 |
+#### 1.2.1. レスポンスヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/json` |
+| 2. | Cache-Control | キャッシュ制御 | string | - | ○ | `no-store` | - |
+| 3. | Pragma | キャッシュ制御 | string | - | ○ | `no-cache` | - |
 
-### ■ Header
-なし
+#### 1.2.2. レスポンスパラメータ
 
-### ■ Body
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | response_code | レスポンスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000` |
+| 2. | access_token | アクセストークン | string | - | ○ | `^[A-Fa-f0-9]{16}_[A-Fa-f0-9]{32}_[0-9]{32}$` | - |
+| 3. | refresh_token | リフレッシュトークン | string | - | ○ | `^[A-Fa-f0-9]{16}_[A-Fa-f0-9]{32}_[0-9]{32}$` | - |
+| 4. | token_type | トークン種別 | string | 6 | ○ | `Bearer` | - |
+| 5. | expires_in | アクセストークン有効期限 | number | - | ○ | - | 秒 |
+| 6. | refresh_token_expires_in | リフレッシュトークン有効期限 | number | - | ○ | - | 秒 |
+| 7. | scope | 発行スコープ | string | - | ○ | - | 空白区切り |
+| 8. | id_token | IDトークン | string | - | - | JWT | `grant_type=authorization_code` の場合に返却 |
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| response_code | String | 正常時は `00000` を返却。 |
-| access_token | String | 発行したアクセストークン。`osolab_id_tokenid_client_id` 形式 |
-| refresh_token | String | 発行したリフレッシュトークン。`osolab_id_tokenid_client_id` 形式 |
-| token_type | String | トークン種別。`Bearer` |
-| expires_in | Number | アクセストークン有効期限秒数 |
-| refresh_token_expires_in | Number | リフレッシュトークン有効期限秒数 |
-| scope | String | 発行したスコープの空白区切り文字列 |
-| id_token | String | `grant_type=authorization_code` の場合に発行したIDトークン |
+## 2. API詳細
 
-### ■ トークン形式
+### 2.1. 処理内容
 
-| 項目 | 形式 | Description |
-| :--- | :--- | :--- |
-| access_token | `^[A-Fa-f0-9]{16}_[A-Fa-f0-9]{32}_[0-9]{32}$` | `osolab_id(HEX16)_token_id(HEX32)_client_id(数字32桁)` |
-| refresh_token | `^[A-Fa-f0-9]{16}_[A-Fa-f0-9]{32}_[0-9]{32}$` | `osolab_id(HEX16)_token_id(HEX32)_client_id(数字32桁)` |
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | リクエストパラメータ確認 | Content-Type、フロー種別、grant_type、各grant必須項目を検証 |
+| 2. | クライアント認証 | Basic認証または `client_id` を検証 |
+| 3. | 認可コード検証 | 認可コード、クライアントID、redirect_uri、PKCEを検証 |
+| 4. | リフレッシュトークン検証 | リフレッシュトークンとクライアントIDを検証 |
+| 5. | トークン発行 | アクセストークンとリフレッシュトークンをRedisへ保存 |
+| 6. | IDトークン発行 | 認可コードグラントの場合、RS256署名付きIDトークンを発行 |
+| 7. | ローテーション | リフレッシュトークングラントの場合、旧リフレッシュトークンを削除 |
 
-### ■ ResponseCode
+### 2.2. シーケンス
 
-| Code | HttpStatusCode | Description |
-| :--- | :--- | :--- |
-| 00000 | 200 | OK |
-| 00001 | 400 | リクエストの内容が異常です |
-| 00002 | 400 | 不正なクライアント |
-| 00005 | 400 | リダイレクトURIが不正 |
-| 00007 | 400 | 無効な grant（認可コード不正 / リフレッシュトークン不正 / クライアント不一致） |
-| 90000 | 500 | ハンドルされていないエラーが発生しました |
+```plantuml
+@startuml
+participant Client
+box "AuthFoundation" #FAEBD7
+  participant API as TokenController
+  participant Sign as OidcSigningService
+  database RDB
+  database Redis
+end box
 
-## ■ 処理概要
-- `grant_type=authorization_code` の場合:
-  - 認可コードを取得し、有効期限と利用状態を検証する
-  - 認可コードに保持した `redirect_uri` とリクエストの `redirect_uri` を完全一致で照合する
-  - `code_verifier` と認可コードに保存した `code_challenge` を照合する
-  - アクセストークン、リフレッシュトークン、IDトークンを発行する
-- `grant_type=refresh_token` の場合:
-  - リフレッシュトークンを検証し、クライアント一致を確認する
-  - 旧リフレッシュトークンを失効して新しいトークンペアへローテーションする
-- `Authorization: Basic` が指定された場合は Basic認証を検証する
-- Basic認証が未指定の場合は `client_id` を検証する
-- アクセストークンとリフレッシュトークンを返却する（`authorization_code` の場合は `id_token` も返却）
+Client -> API : POST /token
+API -> API : 入力検証
+API -> RDB : クライアント認証
+alt authorization_code
+  API -> Redis : AuthCodeSession取得
+  API -> API : redirect_uri/PKCE検証
+  API -> Redis : AccessToken/RefreshToken保存
+  API -> Sign : IDトークン生成
+  API -> Redis : AuthCodeSession削除
+  API -> Client : 200 tokens + id_token
+else refresh_token
+  API -> Redis : RefreshTokenSession取得
+  API -> Redis : 旧RefreshToken削除
+  API -> Redis : 新AccessToken/RefreshToken保存
+  API -> Client : 200 tokens
+end
+
+alt エラー
+  API -> Client : OAuth error
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 400 | invalid_client | 00002 | クライアント認証に失敗しました |
+| 400 | invalid_grant | 00005 | リダイレクトURIが不正 |
+| 400 | invalid_grant | 00007 | grantが無効です |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

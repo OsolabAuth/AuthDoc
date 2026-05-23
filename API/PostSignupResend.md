@@ -1,53 +1,90 @@
-# 認証コード再送
+---
 
-## Endpoint
+description: サインアップ用メール認証コードを再送する
 
-`POST /signup/resend`
+---
 
-## Request
+# サインアップ認証コード再送 <!-- omit in toc -->
 
-### Header
+## 1. API概要
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| Cookie | - | `(^|;\s*)signup_session_id=[A-Fa-f0-9]{32}($|;)` | 認証コード再送対象のサインアップセッションID。 |
-| x-signup-session-id | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替で `signup_session_id` を指定する場合に利用。 |
-| Content-Type | ○ | - | `application/x-www-form-urlencoded` |
+既存のサインアップセッションを用いて認証コードを再生成し、登録対象メールアドレスへ再送する。再送後は未検証状態に戻す。
 
-### Query
+### 1.1. リクエスト
 
-なし
+#### 1.1.1. エンドポイント
 
-### Body
+``` text
+POST /signup/resend
+```
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| signup_session_id | - | `^[A-Fa-f0-9]{32}$` | Cookie/ヘッダー未指定時の代替入力。 |
+#### 1.1.2. リクエストヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/x-www-form-urlencoded` |
+| 2. | Cookie | サインアップセッションCookie | string | - | - | - | `signup_session_id` |
+| 3. | x-signup-session-id | サインアップセッションID | string | 32 | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替 |
 
-### Header
+#### 1.1.3. リクエストパラメータ
 
-なし
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | signup_session_id | サインアップセッションID | string | 32 | - | `^[A-Fa-f0-9]{32}$` | Cookie/ヘッダー未指定時は必須 |
 
-### Body
+### 1.2. レスポンス
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| StatusCode | string | 処理結果コード。 |
-| Message | string | エラーまたは補足メッセージ。 |
+#### 1.2.1. レスポンスヘッダ
 
-## Response Code
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/json` |
 
-| Code | HTTP Status | Description |
-| :--- | :---: | :--- |
-| 00000 | 200 | 認証コード再送成功。 |
-| 00001 | 400 | `signup_session_id` が不正、またはセッションが無効。 |
-| 90000 | 500 | 想定外のサーバエラー。 |
+#### 1.2.2. レスポンスパラメータ
 
-## Processing
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | StatusCode | ステータスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000` |
+| 2. | Message | メッセージ | string | - | ○ | - | 正常時は空文字 |
 
-1. `signup_session_id`（フォーム/ヘッダー/Cookie）を取得し形式検証する。
-2. サインアップセッションを取得し、有効性を検証する。
-3. 認証コードを再発行してメール送信する。
-4. セッションの `verified` を `false` に戻して保存する。
+## 2. API詳細
+
+### 2.1. 処理内容
+
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | リクエストパラメータ確認 | サインアップセッションIDを検証 |
+| 2. | サインアップセッション取得 | Redisからセッションを取得 |
+| 3. | 認証コード再生成 | 既存メールアドレス宛てに新しい認証コードを送信 |
+| 4. | 未検証状態へ更新 | `Verified=false` としてRedisへ保存 |
+
+### 2.2. シーケンス
+
+```plantuml
+@startuml
+participant UI
+box "AuthFoundation" #FAEBD7
+  participant API as SignupResendController
+  participant Mail as GmailSmtpMail
+  database Redis
+end box
+
+UI -> API : POST /signup/resend
+API -> API : 入力検証
+API -> Redis : SignupSession取得
+API -> Mail : 認証コード再送
+API -> Redis : SignupSession更新
+API -> UI : 200 StatusCode=00000
+
+alt エラー
+  API -> UI : error, error_code, error_description
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

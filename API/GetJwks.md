@@ -38,7 +38,7 @@ GET /jwks
 
 | # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
 | --: | :-- | -- | -- | --: | :--: | -- | -- |
-| 1. | keys | 公開鍵一覧 | array(object) | - | ○ | - | 1件以上（有効鍵が存在しない場合は内部生成） |
+| 1. | keys | 公開鍵一覧 | array(object) | - | ○ | - | 1件以上。有効鍵が存在しない場合は内部生成 |
 | 2. | keys[].kid | 鍵ID | string | - | ○ | Base64URL相当 | 署名鍵識別子 |
 | 3. | keys[].kty | 鍵種別 | string | - | ○ | `RSA` | - |
 | 4. | keys[].alg | 署名アルゴリズム | string | - | ○ | `RS256` | - |
@@ -54,9 +54,8 @@ GET /jwks
 | --: | -- | -- |
 | 1. | 鍵情報の初期化判定 | 初回起動時、または `JwkSigningKeyReloadSec` 経過時に鍵情報を再読込 |
 | 2. | 有効JWK取得 | `jwk_master` テーブルから `status=1` を更新日時降順で取得 |
-| 3. | JWK自動生成（必要時） | 有効鍵0件の場合、RSA鍵ペアを生成して `jwk_master` に保存 |
-| 4. | JWKSレスポンス生成 | 取得済み公開鍵を `keys[]` に整形して返却 |
-| 5. | 例外処理 | 予期しない例外発生時はインターナルサーバーエラー（code:90000） |
+| 3. | JWK自動生成 | 有効鍵0件の場合、RSA鍵ペアを生成して `jwk_master` に保存 |
+| 4. | JWKSレスポンス生成 | 公開鍵を `keys[]` に整形して返却 |
 
 ### 2.2. シーケンス
 
@@ -69,26 +68,25 @@ box "AuthFoundation" #FAEBD7
   database RDB as jwk_master
 end box
 
-autonumber "<size:12>#"
 Client -> API : GET /jwks
 API -> Service : CreateJwksAsync()
 Service -> Service : 初期化/リロード判定
-Service -> RDB : 有効鍵(status=1)取得
-alt 有効鍵が0件
+Service -> RDB : 有効鍵取得
+alt 有効鍵なし
   Service -> Service : RSA鍵生成
-  Service -> RDB : 新規鍵を保存
+  Service -> RDB : 新規鍵保存
 end
 Service -> API : keys[]
-API -> Client : 200 OK (keys)
+API -> Client : 200 keys
 
-alt 例外発生
-  API -> Client : 500 (code=90000)
+alt 例外
+  API -> Client : 500 server_error
 end
 @enduml
 ```
 
 ### 2.3. エラーコード
 
-| HTTPレスポンス | code | 説明 | 補足事項 |
+| HTTPレスポンス | error | error_code | error_description |
 | -- | -- | -- | -- |
-| 500 | 90000 | 認証基盤のインターナルサーバーエラー | 予期しない例外 |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |

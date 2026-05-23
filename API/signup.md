@@ -1,61 +1,102 @@
-# アカウント登録
+---
 
-## Endpoint
+description: メール認証済みサインアップセッションからアカウントを作成する
 
-`POST /signup/account`
+---
 
-## Request
+# サインアップ本登録 <!-- omit in toc -->
 
-### Header
+## 1. API概要
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| Cookie | - | `(^|;\s*)signup_session_id=[A-Fa-f0-9]{32}($|;)` | 認証コード検証済みのサインアップセッションID。 |
-| x-signup-session-id | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替で `signup_session_id` を指定する場合に利用。 |
-| Content-Type | ○ | - | `application/x-www-form-urlencoded` |
+メール認証済みのサインアップセッションを用いてユーザーを作成または有効化し、認証セッションを発行する。その後、認可処理を再開して次の遷移先URLを返却する。
 
-### Query
+### 1.1. リクエスト
 
-なし
+#### 1.1.1. エンドポイント
 
-### Body
+``` text
+POST /signup/account
+```
 
-| Name | Required | Regex | Description |
-| :--- | :---: | :--- | :--- |
-| signup_session_id | - | `^[A-Fa-f0-9]{32}$` | Cookie/ヘッダー未指定時の代替入力。 |
-| password | ○ | `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,64}$` | 登録するパスワード。サーバ側でArgon2idハッシュ化して保存する。 |
+#### 1.1.2. リクエストヘッダ
 
-## Response
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/x-www-form-urlencoded` |
+| 2. | Cookie | サインアップセッションCookie | string | - | - | - | `signup_session_id` |
+| 3. | x-signup-session-id | サインアップセッションID | string | 32 | - | `^[A-Fa-f0-9]{32}$` | Cookieの代替 |
 
-### Header
+#### 1.1.3. リクエストパラメータ
 
-| Name | Description |
-| :--- | :--- |
-| Set-Cookie | 登録成功時に `AuthSessionId` と `session_id` を発行する。 |
-| Location | 認可フロー再開先のURL。 |
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | signup_session_id | サインアップセッションID | string | 32 | - | `^[A-Fa-f0-9]{32}$` | Cookie/ヘッダー未指定時は必須 |
+| 2. | password | パスワード | string | 8-64 | ○ | 英大文字・英小文字・数字を各1文字以上 | - |
 
-### Body
+### 1.2. レスポンス
 
-| Name | Type | Description |
-| :--- | :--- | :--- |
-| result | string | `redirect` または `error`。 |
-| response_code | string | 処理結果コード。 |
-| message | string | エラーまたは補足メッセージ。 |
+#### 1.2.1. レスポンスヘッダ
 
-## Response Code
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | Set-Cookie | 認証セッションCookie | string | - | ○ | - | `AuthSessionId` を設定 |
+| 2. | Location | 遷移先URL | string | - | ○ | URI | 認可処理再開後の遷移先 |
+| 3. | Content-Type | コンテンツタイプ | string | - | ○ | - | `application/json` |
 
-| Code | HTTP Status | Description |
-| :--- | :---: | :--- |
-| 00000 | 200 | 本登録成功。認可フローを再開する。 |
-| 00001 | 400 | リクエスト形式、必須パラメータ、パスワード、認証セッションが不正。既存有効メールアドレスが存在する場合も含む。 |
-| 00003 | 400 | 認可セッションが存在しない、または期限切れ。 |
-| 90000 | 500 | 想定外のサーバエラー。 |
-| 90001 | 500 | ID生成に失敗。 |
+#### 1.2.2. レスポンスパラメータ
 
-## Processing
+| # | 物理名 | 論理名 | 型 | サイズ | 必須 | フォーマット | 補足事項 |
+| --: | :-- | -- | -- | --: | :--: | -- | -- |
+| 1. | result | 処理結果 | string | - | ○ | `redirect` | - |
+| 2. | response_code | レスポンスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000` |
+| 3. | message | メッセージ | string | - | ○ | - | 正常時は空文字 |
 
-1. `signup_session_id`（フォーム/ヘッダー/Cookie）と `password` を検証する。
-2. サインアップセッションを取得し、認証コード検証済みであることを確認する。
-3. メールアドレス重複を再確認し、ユーザーを本登録（有効化）する。
-4. ログインセッションを作成し、Cookieへ保存する。
-5. サインアップセッションに保持していた認可セッションIDで認可処理を再実行し、`Location` を返す。
+## 2. API詳細
+
+### 2.1. 処理内容
+
+| # | 処理概要 | 補足事項 |
+| --: | -- | -- |
+| 1. | リクエストパラメータ確認 | サインアップセッションIDとパスワードを検証 |
+| 2. | サインアップセッション取得 | Redisからセッションを取得 |
+| 3. | メール認証済み確認 | `Verified=true` でない場合はエラー |
+| 4. | ユーザー登録/有効化 | 新規ユーザーを作成、または仮登録ユーザーを有効化 |
+| 5. | サインアップセッション削除 | 本登録完了後にRedisから削除 |
+| 6. | 認証セッション発行 | Redisへ認証セッションを保存し、`AuthSessionId` Cookieを設定 |
+| 7. | 認可処理再開 | 元の認可セッションから認可処理を再開し、遷移先URLを返却 |
+
+### 2.2. シーケンス
+
+```plantuml
+@startuml
+participant UI
+box "AuthFoundation" #FAEBD7
+  participant API as SignupAccountController
+  participant Service as AuthorizeExecutionService
+  database RDB
+  database Redis
+end box
+
+UI -> API : POST /signup/account
+API -> API : 入力検証
+API -> Redis : SignupSession取得
+API -> API : Verified確認
+API -> RDB : ユーザー登録/有効化
+API -> Redis : SignupSession削除
+API -> Redis : AuthSession保存
+API -> Service : TryExecuteFromSessionAsync()
+API -> UI : 200 + Location + result=redirect
+
+alt エラー
+  API -> UI : error, error_code, error_description
+end
+@enduml
+```
+
+### 2.3. エラーコード
+
+| HTTPレスポンス | error | error_code | error_description |
+| -- | -- | -- | -- |
+| 400 | invalid_request | 00001 | リクエストパラメータエラー |
+| 400 | invalid_request | 00003 | 画面の有効期限が切れました |
+| 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |
