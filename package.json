@@ -1,0 +1,14 @@
+{
+  "name": "authfoundation-docs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "honkit serve",
+    "build": "honkit build",
+    "summary": "node generate-summary.js"
+  },
+  "devDependencies": {
+    "honkit": "^6.0.0",
+    "honkit-plugin-plantuml-server": "^2.0.2"
+  }
+}
