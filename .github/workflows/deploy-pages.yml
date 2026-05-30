@@ -18,11 +18,11 @@ on:
       render_plantuml:
         description: "Render PlantUML via external server"
         required: true
-        default: "false"
+        default: "true"
         type: choice
         options:
-          - "false"
           - "true"
+          - "false"
 
 permissions:
   contents: read
@@ -58,6 +58,42 @@ jobs:
       - name: Regenerate summary
         if: ${{ inputs.run_summary == 'true' }}
         run: npm run summary
+
+      - name: Normalize PlantUML blocks
+        run: |
+          node <<'JS'
+          const fs = require("fs");
+          const path = require("path");
+
+          const root = process.cwd();
+
+          function walk(dir) {
+            if (!fs.existsSync(dir)) {
+              return [];
+            }
+
+            return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+              const fullPath = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                return walk(fullPath);
+              }
+              return entry.isFile() && entry.name.endsWith(".md") ? [fullPath] : [];
+            });
+          }
+
+          for (const dir of ["API", "Architecture", "Data"]) {
+            for (const filePath of walk(path.join(root, dir))) {
+              const source = fs.readFileSync(filePath, "utf8");
+              const converted = source.replace(
+                /participant\s+UI\s+as\s+Auth UI/g,
+                'participant "Auth UI" as UI',
+              );
+              if (converted !== source) {
+                fs.writeFileSync(filePath, converted);
+              }
+            }
+          }
+          JS
 
       - name: Prepare review build
         if: ${{ inputs.render_plantuml == 'false' }}
