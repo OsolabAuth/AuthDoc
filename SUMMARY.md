@@ -10,6 +10,7 @@
 * [GetTerm](API/GetTerm.md)
 * [GetUserinfo](API/GetUserinfo.md)
 * [GetWellKnown](API/GetWellKnown.md)
+* [POST /account/password](API/PostAccountPassword.md)
 * [PostLogin](API/PostLogin.md)
 * [PostLogout](API/PostLogout.md)
 * [POST /mfa/authenticator/setup](API/PostMfaAuthenticatorSetup.md)
@@ -22,6 +23,9 @@
 * [PostTermConsent](API/PostTermConsent.md)
 * [PostToken](API/PostToken.md)
 * [signup](API/signup.md)
+
+## Architecture
+* [パスワード変更フロー](Architecture/Account/PasswordChange.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)
