@@ -11,6 +11,7 @@
 * [GetUserinfo](API/GetUserinfo.md)
 * [GetWellKnown](API/GetWellKnown.md)
 * [POST /account/password](API/PostAccountPassword.md)
+* [POST /account/withdrawal](API/PostAccountWithdrawal.md)
 * [PostLogin](API/PostLogin.md)
 * [PostLogout](API/PostLogout.md)
 * [POST /mfa/authenticator/setup](API/PostMfaAuthenticatorSetup.md)
@@ -28,6 +29,7 @@
 ## Architecture
 * [パスワード変更フロー](Architecture/Account/PasswordChange.md)
 * [パスワードリセットフロー](Architecture/Account/PasswordReset.md)
+* [退会フロー](Architecture/Account/Withdrawal.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)
