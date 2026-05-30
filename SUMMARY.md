@@ -5,6 +5,7 @@
 ## API
 * [GET /audit/logs](API/GetAuditLogs.md)
 * [GetAuthorize](API/GetAuthorize.md)
+* [GET /health/live, GET /health/ready](API/GetHealth.md)
 * [GetJwks](API/GetJwks.md)
 * [GetLoginStatus](API/GetLoginStatus.md)
 * [GetSignupVerify](API/GetSignupVerify.md)
@@ -35,6 +36,7 @@
 * [退会フロー](Architecture/Account/Withdrawal.md)
 * [AIエージェント委譲認証設計](Architecture/Agent/DelegatedAuth.md)
 * [監査ログ設計](Architecture/Operations/AuditLog.md)
+* [ヘルスチェック設計](Architecture/Operations/HealthCheck.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)
