@@ -19,6 +19,7 @@
 * [Authenticator検証](API/PostMfaAuthenticatorVerify.md)
 * [メールMFA開始](API/PostMfaEmailStart.md)
 * [メールMFA検証](API/PostMfaEmailVerify.md)
+* [パスワードリセット](API/PostPasswordReset.md)
 * [トークン失効](API/PostRevoke.md)
 * [認証コード送信](API/PostSignupEmail.md)
 * [認証コード再送](API/PostSignupResend.md)
@@ -28,6 +29,7 @@
 
 ## Architecture
 * [パスワード変更フロー](Architecture/Account/PasswordChange.md)
+* [パスワードリセットフロー](Architecture/Account/PasswordReset.md)
 * [認証フロー](Architecture/AuthFlow/AuthorizationCodeFlow.md)
 * [認証フロー(省略版)](Architecture/AuthFlow/AuthSimple.md)
 * [多要素認証と強化認可フロー](Architecture/AuthFlow/MfaStepUp.md)
