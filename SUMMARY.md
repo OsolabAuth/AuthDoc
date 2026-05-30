@@ -14,6 +14,10 @@
 * [OpenID Configurationエンドポイント](API/GetWellKnown.md)
 * [認証基盤ログイン](API/PostLogin.md)
 * [ログアウト](API/PostLogout.md)
+* [Authenticator設定開始](API/PostMfaAuthenticatorSetup.md)
+* [Authenticator検証](API/PostMfaAuthenticatorVerify.md)
+* [メールMFA開始](API/PostMfaEmailStart.md)
+* [メールMFA検証](API/PostMfaEmailVerify.md)
 * [トークン失効](API/PostRevoke.md)
 * [認証コード送信](API/PostSignupEmail.md)
 * [認証コード再送](API/PostSignupResend.md)
@@ -24,6 +28,7 @@
 ## Architecture
 * [認証フロー](Architecture/AuthFlow/AuthorizationCodeFlow.md)
 * [認証フロー(省略版)](Architecture/AuthFlow/AuthSimple.md)
+* [多要素認証と強化認可フロー](Architecture/AuthFlow/MfaStepUp.md)
 * [認証フロー(ポータルサイト)](Architecture/AuthFlow/PortalLogin.md)
 * [ログアウトフロー](Architecture/AuthFlow/SignOut.md)
 * [アカウント登録フロー](Architecture/AuthFlow/Signup.md)
