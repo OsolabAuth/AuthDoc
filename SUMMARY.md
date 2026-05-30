@@ -12,6 +12,7 @@
 * [規約取得](API/GetTerm.md)
 * [UserInfoエンドポイント](API/GetUserinfo.md)
 * [OpenID Configurationエンドポイント](API/GetWellKnown.md)
+* [パスワード変更](API/PostAccountPassword.md)
 * [認証基盤ログイン](API/PostLogin.md)
 * [ログアウト](API/PostLogout.md)
 * [Authenticator設定開始](API/PostMfaAuthenticatorSetup.md)
@@ -26,6 +27,7 @@
 * [アカウント登録](API/signup.md)
 
 ## Architecture
+* [パスワード変更フロー](Architecture/Account/PasswordChange.md)
 * [認証フロー](Architecture/AuthFlow/AuthorizationCodeFlow.md)
 * [認証フロー(省略版)](Architecture/AuthFlow/AuthSimple.md)
 * [多要素認証と強化認可フロー](Architecture/AuthFlow/MfaStepUp.md)
