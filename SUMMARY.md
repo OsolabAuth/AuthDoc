@@ -17,6 +17,7 @@
 * [POST /mfa/authenticator/verify](API/PostMfaAuthenticatorVerify.md)
 * [POST /mfa/email/start](API/PostMfaEmailStart.md)
 * [POST /mfa/email/verify](API/PostMfaEmailVerify.md)
+* [POST /password/reset](API/PostPasswordReset.md)
 * [PostRevoke](API/PostRevoke.md)
 * [PostSignupEmail](API/PostSignupEmail.md)
 * [PostSignupResend](API/PostSignupResend.md)
@@ -26,6 +27,7 @@
 
 ## Architecture
 * [パスワード変更フロー](Architecture/Account/PasswordChange.md)
+* [パスワードリセットフロー](Architecture/Account/PasswordReset.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)
