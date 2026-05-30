@@ -1,0 +1,198 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "e9f8ba89-0051-4cbe-aa5a-2bcdff504bb4",
+        "name": "AuthFoundation - Withdrawal"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "b5875a05-9ff4-4036-a49c-6bf851afb418",
+            "name": "Withdrawal",
+            "description": "Production account withdrawal scenario. Use only a disposable test account."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "eb4d819e-082a-4923-b506-87f299884c10",
+                "name": "01. Start email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/start",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "3ba539d7-24ba-45c0-9a19-152fc2cfc628",
+                "name": "02. Verify email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"code\": \"${\\\"AuthFoundation - Withdrawal\\\".\\\"01. Start email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"code\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/verify",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "e01fda05-4496-4d9c-b214-ca551bfcb5f8",
+                "name": "03. Withdraw account with step-up token",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"password\": \"${\\\"Password\\\"}\",\n  \"step_up_token\": \"${\\\"AuthFoundation - Withdrawal\\\".\\\"02. Verify email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"step_up_token\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/account/withdrawal",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "3f38988b-6ba6-4325-b3aa-ae5dfb9cadbd",
+      "name": "production",
+      "variables": {
+        "8c8cd205-642e-45d8-a606-26d77bb06ece": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "e530b4e4-3cd9-42e7-9abf-e8eb3c335e73": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "180348dd-c974-408e-9a26-67318e7b45b0": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "3160f641-bd0a-4b8d-a758-d22a94014ab6": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "6d7b21c3-600c-437a-8b84-76cb8213ba2a": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "5de85d88-1630-402e-bf41-62ca425a751c": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "2a49b7e5-792d-46dc-9bc7-305487cd4ed2": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "ec71a863-d155-4c29-bedf-e0dae4151df5": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "bda96079-6e8a-464a-a775-ac5ea7753b65": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "ee54a336-0966-47f6-bfa4-ef336378c39c": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        }
+      }
+    }
+  ]
+}
