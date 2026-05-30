@@ -5,6 +5,7 @@
 ## API
 * [監査ログ取得](API/GetAuditLogs.md)
 * [認可エンドポイント](API/GetAuthorize.md)
+* [ヘルスチェック取得](API/GetHealth.md)
 * [JWKsエンドポイント](API/GetJwks.md)
 * [ログイン画面表示](API/GetLogin.md)
 * [ログイン状態取得](API/GetLoginStatus.md)
@@ -51,6 +52,7 @@
 * [認証画面設計](Architecture/LoginScreenDesign.md)
 * [OIDC クライアント構成](Architecture/OidcClientDeployment.md)
 * [監査ログ設計](Architecture/Operations/AuditLog.md)
+* [ヘルスチェック設計](Architecture/Operations/HealthCheck.md)
 * [overview](Architecture/overview.md)
 
 ## Data
