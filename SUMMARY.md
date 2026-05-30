@@ -3,6 +3,7 @@
 * [Introduction](README.md)
 
 ## API
+* [監査ログ取得](API/GetAuditLogs.md)
 * [認可エンドポイント](API/GetAuthorize.md)
 * [JWKsエンドポイント](API/GetJwks.md)
 * [ログイン画面表示](API/GetLogin.md)
@@ -49,6 +50,7 @@
 * [JWK鍵管理設計](Architecture/JwkKeyManagement.md)
 * [認証画面設計](Architecture/LoginScreenDesign.md)
 * [OIDC クライアント構成](Architecture/OidcClientDeployment.md)
+* [監査ログ設計](Architecture/Operations/AuditLog.md)
 * [overview](Architecture/overview.md)
 
 ## Data
