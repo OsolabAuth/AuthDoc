@@ -3,6 +3,7 @@
 * [AuthDoc](README.md)
 
 ## API
+* [GET /audit/logs](API/GetAuditLogs.md)
 * [GetAuthorize](API/GetAuthorize.md)
 * [GetJwks](API/GetJwks.md)
 * [GetLoginStatus](API/GetLoginStatus.md)
@@ -33,6 +34,7 @@
 * [パスワードリセットフロー](Architecture/Account/PasswordReset.md)
 * [退会フロー](Architecture/Account/Withdrawal.md)
 * [AIエージェント委譲認証設計](Architecture/Agent/DelegatedAuth.md)
+* [監査ログ設計](Architecture/Operations/AuditLog.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)

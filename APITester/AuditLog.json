@@ -1,0 +1,174 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "202ba68a-4963-4788-bb88-2ef2df8ba920",
+        "name": "AuthFoundation - AuditLog"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "b652b279-d1de-4fa3-9cf6-41ab5c8e0f99",
+            "name": "AuditLog",
+            "description": "Production audit log read scenario."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "b54d1059-0bb8-4a6e-9467-04c2412eaff5",
+                "name": "01. Health ready before audit read",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/health/ready",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "78da9d1b-137d-4091-99f8-bf52b1091ac9",
+                "name": "02. Read latest audit logs",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/audit/logs",
+                  "query": {
+                    "delimiter": "&",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "limit",
+                        "value": "${\"AuditLogLimit\"}"
+                      }
+                    ]
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "2d455407-7490-458d-a0da-14484de185c3",
+      "name": "production",
+      "variables": {
+        "6ffa48d5-01ac-4e62-a2d2-e837519cb9da": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "9398bef0-88ac-4f94-b2cc-aef6556ea0e9": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "6a055e07-9cc1-4e8b-b226-847319c4e7f9": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "6e504dd8-a410-432f-bbf8-e6609c24f777": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "e0a40b40-2006-4b08-8b6d-f4b4a9cbdad6": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "01b075df-a00c-4c1d-b256-e21f4af73084": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "5e200079-a45e-424b-818e-84fabca4d899": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "a0ae226c-0607-4018-b488-eddf6cf9ac0f": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "6d0b4cf3-8f6a-4862-9580-6d0a3dc0a9e6": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "0a3278de-fab5-40e6-8f46-cdafbe6bce34": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "8a5d4879-7cb9-4741-b325-ae04f1d9f016": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuditLogLimit",
+          "value": "50",
+          "enabled": true,
+          "private": false
+        }
+      }
+    }
+  ]
+}
