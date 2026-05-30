@@ -1,4 +1,4 @@
-# 認証フロー(省略版)
+# 認証フロー
 
 ## ■ フロー概要
 Authorization Code Flow
