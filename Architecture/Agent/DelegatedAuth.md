@@ -75,13 +75,13 @@ Phase 1でAIエージェントに許可するscopeは、低リスクな課題管
 
 Auth backendが扱うAPIは以下に限定する。
 
-- `POST /agent`
-- `POST /agent/{agent_id}/secret`
-- `POST /agent/{agent_id}/delegations`
-- `DELETE /agent/{agent_id}/delegations/{delegation_id}`
-- `POST /agent/token`
-- `GET /agent/me`
-- `GET /agent/audit-logs`
+- [POST /agent](../../API/PostAgent.md)
+- [POST /agent/{agent_id}/secret](../../API/PostAgentSecret.md)
+- [POST /agent/{agent_id}/delegations](../../API/PostAgentDelegation.md)
+- [DELETE /agent/{agent_id}/delegations/{delegation_id}](../../API/DeleteAgentDelegation.md)
+- [POST /agent/token](../../API/PostAgentToken.md)
+- [GET /agent/me](../../API/GetAgentMe.md)
+- [GET /agent/audit-logs](../../API/GetAgentAuditLogs.md)
 
 ## シーケンス
 
