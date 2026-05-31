@@ -1,0 +1,367 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "1bba9d97-9a44-4c9d-aa08-ab59a748fb36",
+        "name": "AuthFoundation - PortalLogin"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "11c4ab8d-2704-41e1-ae42-7fb6b879734f",
+            "name": "PortalLogin",
+            "description": "Production portal login scenario as an OIDC client."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "4e1464b6-5ec3-499b-a52b-4d465c35405a",
+                "name": "01. Portal authorize request",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/authorize",
+                  "query": {
+                    "delimiter": "&",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "response_type",
+                        "value": "code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"PortalClientId\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"PortalRedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "state",
+                        "value": "${\"State\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "scope",
+                        "value": "${\"Scope\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge_method",
+                        "value": "S256"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge",
+                        "value": "${\"CodeChallenge\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "nonce",
+                        "value": "${\"Nonce\"}"
+                      }
+                    ]
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "x-auth-ui-response-mode",
+                    "value": "json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "d0660ec9-2916-475c-99e0-6525642eb3cb",
+                "name": "02. Login for portal authorize session",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": false,
+                        "type": "Text",
+                        "name": "request_id",
+                        "value": "AuthRequestSessionId is carried by Set-Cookie from the authorize response."
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "email",
+                        "value": "${\"Email\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "password",
+                        "value": "${\"Password\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/login",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": false,
+                    "name": "Cookie",
+                    "value": "Chrome cookie jar carries AuthRequestSessionId from the authorize response. Do not set Cookie manually."
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "c06bb9c0-0fc0-47e4-ad68-88df8661271a",
+                "name": "03. Exchange portal authorization code",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "grant_type",
+                        "value": "authorization_code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"PortalClientId\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"PortalRedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code",
+                        "value": "${\"AuthFoundation - PortalLogin\".\"02. Login for portal authorize session\".\"response\".\"body\".\"authorization_code\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_verifier",
+                        "value": "${\"CodeVerifier\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/token",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": true,
+                    "name": "x-flow-type",
+                    "value": "AuthorizationCode"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "5001b299-271d-413c-82d9-f4e072ecddf5",
+                "name": "04. Portal UserInfo",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/userinfo",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Authorization",
+                    "value": "Bearer ${\"AuthFoundation - PortalLogin\".\"03. Exchange portal authorization code\".\"response\".\"body\".\"access_token\"}"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "3801ee1d-65fa-4e2a-b66e-00581ac1585f",
+      "name": "production",
+      "variables": {
+        "7bd757c5-9859-4be1-93cb-c4b1754d661c": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "9712398b-ff19-4f05-be42-5778ab1dc556": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "eec81aa1-87e6-4ebf-901d-70864ad77629": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "e7847a42-fc4a-433e-af40-e59b22939d85": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "35f9c580-ad9f-47a3-8cbe-b88ee0437a03": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "a8327a11-308a-4c58-a4c2-8e30ea8b0045": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "10203f68-48a7-43f2-841f-05ff98d95ecd": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "702edd8d-6151-4219-bf10-951929f26a65": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "ceb4ee24-fd5a-4504-993a-b267e0288dae": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "0e53e513-e08a-45ec-bd74-3d2e711529fc": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "bc18a87f-989a-4f0d-9cd0-8ff6c742aa9b": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "PortalClientId",
+          "value": "00000000000000000000000000000000",
+          "enabled": true,
+          "private": false
+        },
+        "acfa360a-24b5-4aac-9a9d-8509a9b4da62": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "PortalRedirectUri",
+          "value": "https://portal.osolab-auth.jp/callback",
+          "enabled": true,
+          "private": false
+        }
+      }
+    }
+  ]
+}

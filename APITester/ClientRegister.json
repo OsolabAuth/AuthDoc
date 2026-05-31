@@ -1,0 +1,369 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "5813650a-6733-42e9-807a-b60b79a27f26",
+        "name": "AuthFoundation - ClientRegister"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "996eb369-6e78-40cc-9971-e4e543ccd995",
+            "name": "ClientRegister",
+            "description": "Registers an OIDC client, then uses the returned client_id in an authorization request."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "086eb887-8780-4f6f-87ff-f4479462efb0",
+                "name": "01. Register client",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"client_name\": \"${\\\"ClientName\\\"}\",\n  \"client_type\": \"Public\",\n  \"redirect_uris\": [\n    \"${\\\"RedirectUri\\\"}\"\n  ],\n  \"scopes\": [\n    \"openid\",\n    \"email\",\n    \"profile\"\n  ],\n  \"data_keys\": [\n    \"email\",\n    \"name\",\n    \"picture\"\n  ]\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/client",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "enabled": true,
+                    "name": "Authorization",
+                    "value": "Bearer ${\"AdminAccessToken\"}"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "d0e0f041-7ab0-41da-a39f-a634d1c699e2",
+                "name": "02. Start authorize with registered client",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/authorize",
+                  "query": {
+                    "delimiter": "&",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "response_type",
+                        "value": "code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"AuthFoundation - ClientRegister\".\"01. Register client\".\"response\".\"body\".\"client_id\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"RedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "state",
+                        "value": "${\"State\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "scope",
+                        "value": "${\"Scope\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge_method",
+                        "value": "S256"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge",
+                        "value": "${\"CodeChallenge\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "nonce",
+                        "value": "${\"Nonce\"}"
+                      }
+                    ]
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "x-auth-ui-response-mode",
+                    "value": "json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "5ba34e8a-b808-40ed-add4-e3c3b62652da",
+                "name": "03. Login for registered client authorize session",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": false,
+                        "type": "Text",
+                        "name": "request_id",
+                        "value": "AuthRequestSessionId is carried by Set-Cookie from the authorize response."
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "email",
+                        "value": "${\"Email\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "password",
+                        "value": "${\"Password\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/login",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": false,
+                    "name": "Cookie",
+                    "value": "Chrome cookie jar carries AuthRequestSessionId from the authorize response. Do not set Cookie manually."
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "6bfe4fea-ee84-4f11-a73a-89528bfaa109",
+                "name": "04. Exchange registered client authorization code",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "grant_type",
+                        "value": "authorization_code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"AuthFoundation - ClientRegister\".\"01. Register client\".\"response\".\"body\".\"client_id\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"RedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code",
+                        "value": "${\"AuthFoundation - ClientRegister\".\"03. Login for registered client authorize session\".\"response\".\"body\".\"authorization_code\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_verifier",
+                        "value": "${\"CodeVerifier\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/token",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": true,
+                    "name": "x-flow-type",
+                    "value": "AuthorizationCode"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "bbb83b2b-2d7c-4cae-968e-827435621a53",
+      "name": "production",
+      "variables": {
+        "b4d91375-727f-41b0-a5c7-05f916120001": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "0e69e4da-02c2-4eb0-9331-3f205f542cbf": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "bee5e26c-d309-4496-8fbd-d931d07af419": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "d4c62d59-1654-4b77-baa8-b4ac335340a1": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "b901afea-077d-4cb9-ab20-88bb3ca8ec24": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "f3681f80-b58a-44db-a2fa-304af6e6f3ce": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "5ec5f98f-a15f-4c15-80a4-c9361b7e888a": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "44f348ff-e7a4-4f9c-a401-df01546bc047": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "41621bcd-578f-4f95-bac4-87107d1bdb33": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "beb97894-685b-4bc7-bc78-7fa81d31164c": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "63b8730f-89ab-49f6-9e30-b2f0a585a232": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientName",
+          "value": "Taiga production scenario client",
+          "enabled": true,
+          "private": false
+        },
+        "b18b102a-d7c1-4fb9-a881-71c8371dfb29": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AdminAccessToken",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        }
+      }
+    }
+  ]
+}
