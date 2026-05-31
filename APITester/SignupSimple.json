@@ -1,0 +1,191 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "69887bf8-ee91-4a42-a4a8-005ced36e88f",
+        "name": "AuthFoundation - SignupSimple"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "af4e4a20-2dc0-4bbd-8ac0-c32fb97171bd",
+            "name": "SignupSimple",
+            "description": "Minimal production signup scenario for account creation only."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "033dc36d-d369-4f5f-a281-b93866a74777",
+                "name": "01. Get current terms",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/terms/current",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "c4e5fa4a-8f6e-4a96-8513-8f97c982e6ca",
+                "name": "02. Create signup account",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"SignupEmail\\\"}\",\n  \"password\": \"${\\\"SignupPassword\\\"}\",\n  \"name\": \"${\\\"Name\\\"}\",\n  \"birth_date\": \"${\\\"BirthDate\\\"}\",\n  \"terms_accepted\": true,\n  \"accepted_terms_id\": \"${\\\"AuthFoundation - SignupSimple\\\".\\\"01. Get current terms\\\".\\\"response\\\".\\\"body\\\".\\\"terms_id\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/signup",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "76c05bac-0e45-4a90-b52f-5b4ad8806f29",
+      "name": "production",
+      "variables": {
+        "0948fe14-05dd-4002-ba48-52ff3a164b13": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "e87edac9-6b82-45b5-b319-c02570ee5be4": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "bf269b06-8689-4dda-820e-e81def18532f": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "855292c9-6b39-4070-9341-17df54caef8b": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "a6f2ad5a-8515-46e0-842a-ecb95dfcb0a0": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "d84e8f18-462e-4a9e-be87-eaf8c94b9b8c": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "6de18c3a-d94d-4508-869f-8af02e261bf2": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "85451561-f782-498b-9735-7de06de7b023": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "95e4dc83-bce5-48be-a683-0751ca9f1d8b": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "cad6aac4-7d46-4668-b7c6-e6c5c943c715": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "18dea0a1-0dd3-4970-ab02-5e6d4da70a51": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "SignupEmail",
+          "value": "osolab-api-test+simple@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "daddc791-cef0-433a-b342-b7814d21a095": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "SignupPassword",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "71736c9e-a8b0-477f-929e-097a4ca04152": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Name",
+          "value": "Osolab API Test",
+          "enabled": true,
+          "private": false
+        },
+        "4ac7cb47-08c6-46aa-b609-b394f191ee9e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "BirthDate",
+          "value": "1990-01-01",
+          "enabled": true,
+          "private": false
+        }
+      }
+    }
+  ]
+}
