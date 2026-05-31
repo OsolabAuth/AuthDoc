@@ -3,6 +3,9 @@
 * [AuthDoc](README.md)
 
 ## API
+* [DELETE /agent/{agent_id}/delegations/{delegation_id}](API/DeleteAgentDelegation.md)
+* [GET /agent/audit-logs](API/GetAgentAuditLogs.md)
+* [GET /agent/me](API/GetAgentMe.md)
 * [GetAuthorize](API/GetAuthorize.md)
 * [GetJwks](API/GetJwks.md)
 * [GetLoginStatus](API/GetLoginStatus.md)
@@ -13,6 +16,8 @@
 * [POST /account/password](API/PostAccountPassword.md)
 * [POST /account/withdrawal](API/PostAccountWithdrawal.md)
 * [POST /agent](API/PostAgent.md)
+* [POST /agent/{agent_id}/delegations](API/PostAgentDelegation.md)
+* [POST /agent/{agent_id}/secret](API/PostAgentSecret.md)
 * [POST /agent/token](API/PostAgentToken.md)
 * [PostLogin](API/PostLogin.md)
 * [PostLogout](API/PostLogout.md)
