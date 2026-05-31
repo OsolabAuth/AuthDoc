@@ -1,0 +1,400 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "4b2c0f6c-2b2c-48d0-a44d-5a6b6e1b1d10",
+        "name": "OsolabAuth AuthFoundation"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "description": "Local smoke checks for AuthFoundation public endpoints.",
+            "id": "1cc86583-c7ab-40d0-9d96-8fbfc57df801",
+            "name": "01. Local smoke"
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+              "name": "GET"
+            },
+            "body": {
+              "formBody": {
+                "overrideContentType": true,
+                "encoding": "application/x-www-form-urlencoded",
+                "items": []
+              },
+              "bodyType": "Text"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/version"
+            },
+            "id": "d92220d0-7e12-4ac8-bd35-996e3f7b9be1",
+            "name": "01. Version",
+            "headers": []
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+              "name": "GET"
+            },
+            "body": {
+              "formBody": {
+                "overrideContentType": true,
+                "encoding": "application/x-www-form-urlencoded",
+                "items": []
+              },
+              "bodyType": "Text"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/health/live"
+            },
+            "id": "7328b7d2-d42d-46f6-a16c-62e2d91e42b8",
+            "name": "02. Health live",
+            "headers": []
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+              "name": "GET"
+            },
+            "body": {
+              "formBody": {
+                "overrideContentType": true,
+                "encoding": "application/x-www-form-urlencoded",
+                "items": []
+              },
+              "bodyType": "Text"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/health/ready"
+            },
+            "id": "6c5e6587-4d31-4430-969f-a7406fa9ea9e",
+            "name": "03. Health ready",
+            "headers": []
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+              "name": "GET"
+            },
+            "body": {
+              "formBody": {
+                "overrideContentType": true,
+                "encoding": "application/x-www-form-urlencoded",
+                "items": []
+              },
+              "bodyType": "Text"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/.well-known/openid-configuration"
+            },
+            "id": "9829108b-3f15-4dcb-b718-55c21b8f8404",
+            "name": "04. OpenID Configuration",
+            "headers": []
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+              "name": "GET"
+            },
+            "body": {
+              "formBody": {
+                "overrideContentType": true,
+                "encoding": "application/x-www-form-urlencoded",
+                "items": []
+              },
+              "bodyType": "Text"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/jwks"
+            },
+            "id": "8484c83f-e08d-418b-8186-156909a7f8f6",
+            "name": "05. JWKS",
+            "headers": []
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+              "name": "GET"
+            },
+            "body": {
+              "formBody": {
+                "overrideContentType": true,
+                "encoding": "application/x-www-form-urlencoded",
+                "items": []
+              },
+              "bodyType": "Text"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/terms/current"
+            },
+            "id": "d2fd2140-5f79-45b3-b899-87dc6b608ba4",
+            "name": "06. Current terms",
+            "headers": []
+          }
+        },
+        {
+          "entity": {
+            "type": "Scenario",
+            "description": "Creates an MFA step-up token, registers an agent with the current implementation, and gets an agent token.",
+            "id": "d03098d1-2fd5-4d15-9dd8-5f79c94353cf",
+            "name": "02. MFA to agent token"
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "requestBody": true,
+              "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+              "name": "POST"
+            },
+            "body": {
+              "bodyType": "Text",
+              "textBody": "{\n  \"email\": \"${\"email\"}\"\n}"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/mfa/email/start"
+            },
+            "id": "d4df87bb-ec82-45eb-b55d-263d1a7b0f33",
+            "name": "01. Start email MFA",
+            "headers": [
+              {
+                "enabled": true,
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "requestBody": true,
+              "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+              "name": "POST"
+            },
+            "body": {
+              "bodyType": "Text",
+              "textBody": "{\n  \"email\": \"${\"email\"}\",\n  \"code\": \"${getEntityById(\"d4df87bb-ec82-45eb-b55d-263d1a7b0f33\").\"response\".\"body\".\"code\"}\"\n}"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/mfa/email/verify"
+            },
+            "id": "9f91d9df-16d9-463b-98dd-383ad10a7939",
+            "name": "02. Verify email MFA",
+            "headers": [
+              {
+                "enabled": true,
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "requestBody": true,
+              "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+              "name": "POST"
+            },
+            "body": {
+              "bodyType": "Text",
+              "textBody": "{\n  \"owner_email\": \"${\"email\"}\",\n  \"agent_name\": \"${\"agentName\"}\",\n  \"client_id\": \"${\"clientId\"}\",\n  \"scope\": \"${\"agentScope\"}\",\n  \"expires_days\": ${\"agentExpiresDays\"},\n  \"step_up_token\": \"${getEntityById(\"9f91d9df-16d9-463b-98dd-383ad10a7939\").\"response\".\"body\".\"step_up_token\"}\"\n}"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/agent"
+            },
+            "id": "42d953e2-59dc-47a9-8f90-6a0a6d095ed4",
+            "name": "03. Create agent",
+            "headers": [
+              {
+                "enabled": true,
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "requestBody": true,
+              "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+              "name": "POST"
+            },
+            "body": {
+              "bodyType": "Text",
+              "textBody": "{\n  \"agent_id\": \"${getEntityById(\"42d953e2-59dc-47a9-8f90-6a0a6d095ed4\").\"response\".\"body\".\"agent_id\"}\",\n  \"agent_secret\": \"${getEntityById(\"42d953e2-59dc-47a9-8f90-6a0a6d095ed4\").\"response\".\"body\".\"agent_secret\"}\",\n  \"client_id\": \"${\"clientId\"}\",\n  \"scope\": \"${\"agentScope\"}\"\n}"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/agent/token"
+            },
+            "id": "1cd10044-b042-4917-a6e5-a4b5dac38da1",
+            "name": "04. Get agent token",
+            "headers": [
+              {
+                "enabled": true,
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        },
+        {
+          "entity": {
+            "type": "Request",
+            "method": {
+              "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+              "name": "GET"
+            },
+            "body": {
+              "formBody": {
+                "overrideContentType": true,
+                "encoding": "application/x-www-form-urlencoded",
+                "items": []
+              },
+              "bodyType": "Text"
+            },
+            "uri": {
+              "query": {
+                "delimiter": "&",
+                "items": []
+              },
+              "host": "${\"AuthServer\"}",
+              "path": "/audit/logs"
+            },
+            "id": "59fe470d-9f6d-4874-9a47-d96f05f54df9",
+            "name": "05. Audit logs",
+            "headers": []
+          }
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "fdc0172b-950c-4852-85a1-0f90a8f77058",
+      "name": "local_debug",
+      "variables": {
+        "66e73160-e78c-4497-b0b2-8022c0468abc": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "http://localhost:5000",
+          "enabled": true,
+          "private": false
+        },
+        "14b227ec-672e-41c7-9e37-b7f569f7bf12": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "email",
+          "value": "demo@example.com",
+          "enabled": true,
+          "private": false
+        },
+        "a0dce665-44e4-49f5-8da8-dc9063d99e84": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "clientId",
+          "value": "00000000000000000000000000000000",
+          "enabled": true,
+          "private": false
+        },
+        "7cbb1f8c-307b-40e4-a97e-3118d33407d1": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "agentName",
+          "value": "Issue Triage Agent",
+          "enabled": true,
+          "private": false
+        },
+        "dbdb7a09-8f9d-4653-a41d-8f73325aca4b": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "agentScope",
+          "value": "openid profile",
+          "enabled": true,
+          "private": false
+        },
+        "8c8b0d16-6c5a-41d7-94d5-e9a7f43c7324": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "agentExpiresDays",
+          "value": "7",
+          "enabled": true,
+          "private": false
+        }
+      }
+    }
+  ]
+}

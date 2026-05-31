@@ -2,6 +2,9 @@
 
 * [AuthDoc](README.md)
 
+## api_tester
+* [API Tester scenarios](api_tester/README.md)
+
 ## API
 * [DELETE /agent/{agent_id}/delegations/{delegation_id}](API/DeleteAgentDelegation.md)
 * [GET /agent/audit-logs](API/GetAgentAuditLogs.md)
