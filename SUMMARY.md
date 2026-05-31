@@ -12,6 +12,10 @@
 * [GetWellKnown](API/GetWellKnown.md)
 * [PostLogin](API/PostLogin.md)
 * [PostLogout](API/PostLogout.md)
+* [POST /mfa/authenticator/setup](API/PostMfaAuthenticatorSetup.md)
+* [POST /mfa/authenticator/verify](API/PostMfaAuthenticatorVerify.md)
+* [POST /mfa/email/start](API/PostMfaEmailStart.md)
+* [POST /mfa/email/verify](API/PostMfaEmailVerify.md)
 * [PostRevoke](API/PostRevoke.md)
 * [PostSignupEmail](API/PostSignupEmail.md)
 * [PostSignupResend](API/PostSignupResend.md)
@@ -46,6 +50,7 @@
 ## Sequence
 * [認証フロー](Sequence/AuthorizationCodeFlow.md)
 * [Client Registration Flow](Sequence/ClientRegister.md)
+* [MFA / Step-up Authorization Flow](Sequence/MfaStepUp.md)
 * [Portal Login Flow](Sequence/PortalLogin.md)
 * [Sign-out / Token Revocation Flow](Sequence/SignOut.md)
 * [Signup Flow](Sequence/Signup.md)
