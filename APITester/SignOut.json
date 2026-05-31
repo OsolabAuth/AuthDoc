@@ -1,0 +1,404 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "9905cf1c-7304-4c86-95f1-8996749413e5",
+        "name": "AuthFoundation - SignOut"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "069012fb-56df-480b-ad9e-6aa2e0b11792",
+            "name": "SignOut",
+            "description": "Production sign-out scenario: login, issue tokens, revoke access token, then logout."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "e7d796a5-4048-4351-91fe-4f28551e58d4",
+                "name": "01. Start authorize request",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/authorize",
+                  "query": {
+                    "delimiter": "&",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "response_type",
+                        "value": "code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"ClientId\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"RedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "state",
+                        "value": "${\"State\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "scope",
+                        "value": "${\"Scope\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge_method",
+                        "value": "S256"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge",
+                        "value": "${\"CodeChallenge\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "nonce",
+                        "value": "${\"Nonce\"}"
+                      }
+                    ]
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "x-auth-ui-response-mode",
+                    "value": "json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "c2777f9a-cb5e-4b45-822e-2aac56d85f5a",
+                "name": "02. Login for authorize session",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": false,
+                        "type": "Text",
+                        "name": "request_id",
+                        "value": "AuthRequestSessionId is carried by Set-Cookie from the authorize response."
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "email",
+                        "value": "${\"Email\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "password",
+                        "value": "${\"Password\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/login",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": false,
+                    "name": "Cookie",
+                    "value": "Chrome cookie jar carries AuthRequestSessionId from the authorize response. Do not set Cookie manually."
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "7f67906c-df09-4998-9bee-4bbeeecf94ff",
+                "name": "03. Exchange authorization code",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "grant_type",
+                        "value": "authorization_code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"ClientId\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"RedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code",
+                        "value": "${\"AuthFoundation - SignOut\".\"02. Login for authorize session\".\"response\".\"body\".\"authorization_code\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_verifier",
+                        "value": "${\"CodeVerifier\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/token",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": true,
+                    "name": "x-flow-type",
+                    "value": "AuthorizationCode"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "a7cf092b-972f-401c-abb3-c1d41648cbbb",
+                "name": "04. Revoke issued access token",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "token",
+                        "value": "${\"AuthFoundation - SignOut\".\"03. Exchange authorization code\".\"response\".\"body\".\"access_token\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/revoke",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "d5bef973-4952-4eca-8a88-77e792938018",
+                "name": "05. Logout current auth session",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "logout_all",
+                        "value": "false"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/logout",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "79a02d46-82ff-49a9-91d0-fa75111c140e",
+      "name": "production",
+      "variables": {
+        "823a624d-fa9a-4dff-924d-68d3e123ae58": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "7345fa0c-5bda-4c71-82b1-51d00e697b7e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "dddd4d80-de08-461c-a05a-32f230adb75e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "ba5d5439-2184-472b-8e82-38e31c9630fa": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "3553e7c5-55cc-45f5-b79d-d2824539a2d1": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "ed55fda9-a47e-4a2d-9ad8-87b1b2ee34f5": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "f816c67f-cec7-4f08-af30-a7fb5379d8d8": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "8a561d9e-8521-42e2-bad3-f2d8c0154a80": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "9b61d3f6-0d03-408e-9a06-dd24e65d4023": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "42f082f7-a3fb-4796-a5a7-51d366fecca0": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        }
+      }
+    }
+  ]
+}
