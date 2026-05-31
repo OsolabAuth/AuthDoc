@@ -35,6 +35,7 @@
 * [パスワードリセットフロー](Architecture/Account/PasswordReset.md)
 * [退会フロー](Architecture/Account/Withdrawal.md)
 * [AIエージェント委譲認証設計](Architecture/Agent/DelegatedAuth.md)
+* [AI Agent Delegated Scope Policy](Architecture/Agent/ScopePolicy.md)
 * [AI Agent Secret Management](Architecture/Agent/SecretManagement.md)
 
 ## Data
