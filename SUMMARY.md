@@ -59,6 +59,7 @@
 * [認証画面設計](ScreenDesign/LoginScreenDesign.md)
 
 ## Sequence
+* [AI Agent Delegated Auth Flow](Sequence/AgentDelegatedAuthFlow.md)
 * [認証フロー](Sequence/AuthorizationCodeFlow.md)
 * [Client Registration Flow](Sequence/ClientRegister.md)
 * [MFA / Step-up Authorization Flow](Sequence/MfaStepUp.md)
