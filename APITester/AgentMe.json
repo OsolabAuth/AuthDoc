@@ -1,0 +1,159 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "50b703b9-bb39-4f45-91d5-9e0457f7e591",
+        "name": "AuthFoundation - AgentMe"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "ec4d3a09-2b4e-409e-a19d-96741060b769",
+            "name": "AgentMe",
+            "description": "Create an AI agent delegation, then validate the agent credential with GET /agent/me. Set AgentBasicCredential to base64(agent_id:agent_secret) from step 03 before running step 04."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "19e361d6-6478-4f9e-a587-fb0f2d5e7001",
+                "name": "01. Start email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"OwnerEmail\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/start",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "c0fbf351-80c1-4c06-934f-1387be9ff9a7",
+                "name": "02. Verify email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"OwnerEmail\\\"}\",\n  \"code\": \"${\\\"AuthFoundation - AgentMe\\\".\\\"01. Start email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"code\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/verify",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "608c1287-6183-462a-b161-8c32864d1eef",
+                "name": "03. Create agent delegation",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"owner_email\": \"${\\\"OwnerEmail\\\"}\",\n  \"agent_name\": \"${\\\"AgentName\\\"}\",\n  \"client_id\": \"${\\\"ClientId\\\"}\",\n  \"scope\": \"${\\\"AgentScope\\\"}\",\n  \"expires_days\": 30,\n  \"step_up_token\": \"${\\\"AuthFoundation - AgentMe\\\".\\\"02. Verify email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"step_up_token\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/agent",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "6e67c417-63fd-4e91-a55f-d68053537909",
+                "name": "04. Inspect agent credential",
+                "method": {
+                  "requestBody": false,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "GET"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/agent/me",
+                  "query": {
+                    "delimiter": "&",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "name": "client_id",
+                        "value": "${\"ClientId\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "name": "scope",
+                        "value": "task_read"
+                      }
+                    ]
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Authorization",
+                    "value": "Basic ${\"AgentBasicCredential\"}"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

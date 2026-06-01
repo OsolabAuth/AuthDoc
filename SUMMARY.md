@@ -4,6 +4,7 @@
 
 ## API
 * [GetAuthorize](API/GetAuthorize.md)
+* [GET /agent/me](API/GetAgentMe.md)
 * [GetJwks](API/GetJwks.md)
 * [GetLoginStatus](API/GetLoginStatus.md)
 * [GetSignupVerify](API/GetSignupVerify.md)
