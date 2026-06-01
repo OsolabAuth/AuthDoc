@@ -1,11 +1,38 @@
 # POST /mfa/email/start
 
-メールMFAの認証コード送信を開始する。
+Starts an email MFA challenge.
 
 ## Request
 
-ログイン済みセッションを前提に、登録メールアドレスへ短命コードを送信する。
+```json
+{
+  "email": "user@example.com"
+}
+```
 
 ## Response
 
-送信結果と有効期限を返す。
+The verification code itself must not be returned.
+
+```json
+{
+  "result": "challenge_created",
+  "delivery": "email",
+  "email": "user@example.com",
+  "expires_at": "2026-06-01T12:00:00Z"
+}
+```
+
+## Error
+
+| HTTP status | response_code | error | condition |
+| --- | --- | --- | --- |
+| 400 | `00001` | `invalid_request` | `email` is invalid |
+| 401 | `00008` | `invalid_token` | user does not exist |
+
+## Security Requirements
+
+- Do not include `code` in the response.
+- Generate MFA codes with a cryptographically secure random number generator.
+- Keep the code short-lived.
+- Make the code one-time use after successful verification.
