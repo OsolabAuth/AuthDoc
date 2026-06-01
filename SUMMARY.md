@@ -39,6 +39,7 @@
 * [AI Agent Secret Management](Architecture/Agent/SecretManagement.md)
 * [Authenticator Setup Step-up Requirement](Architecture/Security/AuthenticatorSetupStepUp.md)
 * [MFA Email Code Hardening](Architecture/Security/MfaEmailCodeHardening.md)
+* [Password Reset Email Code Requirement](Architecture/Security/PasswordResetEmailCode.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)
