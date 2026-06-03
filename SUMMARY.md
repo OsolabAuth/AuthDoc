@@ -37,6 +37,7 @@
 * [AIエージェント委譲認証設計](Architecture/Agent/DelegatedAuth.md)
 * [AI Agent Delegated Scope Policy](Architecture/Agent/ScopePolicy.md)
 * [AI Agent Secret Management](Architecture/Agent/SecretManagement.md)
+* [Repository Boundary for InMemory Stores](Architecture/Data/RepositoryBoundary.md)
 * [Authenticator Setup Step-up Requirement](Architecture/Security/AuthenticatorSetupStepUp.md)
 * [MFA Email Code Hardening](Architecture/Security/MfaEmailCodeHardening.md)
 * [Password Reset Email Code Requirement](Architecture/Security/PasswordResetEmailCode.md)
