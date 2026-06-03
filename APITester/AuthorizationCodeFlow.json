@@ -1,330 +1,411 @@
-﻿{
-    "version":  6,
-    "entities":  [
-                     {
-                         "entity":  {
-                                        "type":  "Project",
-                                        "id":  "3031ac0b-e8e6-4943-a725-cff1eb38e3e8",
-                                        "name":  "AuthFoundation - AuthorizationCodeFlow"
-                                    },
-                         "children":  [
-                                          {
-                                              "entity":  {
-                                                             "type":  "Scenario",
-                                                             "id":  "6c9b2157-c2c3-460c-b18b-21ee98e65886",
-                                                             "name":  "AuthorizationCodeFlow",
-                                                             "description":  "Production Authorization Code + PKCE scenario. Later steps consume values returned by earlier responses."
-                                                         },
-                                              "children":  [
-                                                               {
-                                                                   "entity":  {
-                                                                                  "type":  "Request",
-                                                                                  "id":  "b9bdc44b-8c41-408c-9986-b34007e12c6c",
-                                                                                  "name":  "01. Start authorize request",
-                                                                                  "method":  {
-                                                                                                 "link":  "http://tools.ietf.org/html/rfc7231#section-4.3.1",
-                                                                                                 "name":  "GET"
-                                                                                             },
-                                                                                  "body":  {
-                                                                                               "bodyType":  "Text",
-                                                                                               "formBody":  {
-                                                                                                                "overrideContentType":  true,
-                                                                                                                "encoding":  "application/x-www-form-urlencoded",
-                                                                                                                "items":  [
-
-                                                                                                                          ]
-                                                                                                            }
-                                                                                           },
-                                                                                  "uri":  {
-                                                                                              "host":  "${\"AuthServer\"}",
-                                                                                              "path":  "/authorize",
-                                                                                              "query":  {
-                                                                                                            "delimiter":  "\u0026",
-                                                                                                            "items":  [
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "response_type",
-                                                                                                                              "value":  "code"
-                                                                                                                          },
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "client_id",
-                                                                                                                              "value":  "${\"ClientId\"}"
-                                                                                                                          },
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "redirect_uri",
-                                                                                                                              "value":  "${\"RedirectUri\"}"
-                                                                                                                          },
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "state",
-                                                                                                                              "value":  "${\"State\"}"
-                                                                                                                          },
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "scope",
-                                                                                                                              "value":  "${\"Scope\"}"
-                                                                                                                          },
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "code_challenge_method",
-                                                                                                                              "value":  "S256"
-                                                                                                                          },
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "code_challenge",
-                                                                                                                              "value":  "${\"CodeChallenge\"}"
-                                                                                                                          },
-                                                                                                                          {
-                                                                                                                              "enabled":  true,
-                                                                                                                              "type":  "Text",
-                                                                                                                              "name":  "nonce",
-                                                                                                                              "value":  "${\"Nonce\"}"
-                                                                                                                          }
-                                                                                                                      ]
-                                                                                                        }
-                                                                                          },
-                                                                                  "headers":  [
-                                                                                                  {
-                                                                                                      "enabled":  true,
-                                                                                                      "name":  "x-auth-ui-response-mode",
-                                                                                                      "value":  "json"
-                                                                                                  }
-                                                                                              ],
-                                                                                  "assertions":  [
-
-                                                                                                 ]
-                                                                              }
-                                                               },
-                                                               {
-                                                                   "entity":  {
-                                                                                  "type":  "Request",
-                                                                                  "id":  "c0708302-0e1f-4f9b-81cc-6a8e7b2efe51",
-                                                                                  "name":  "02. Login for authorize session",
-                                                                                  "method":  {
-                                                                                                 "requestBody":  true,
-                                                                                                 "link":  "https://tools.ietf.org/html/rfc7231#section-4.3",
-                                                                                                 "name":  "POST"
-                                                                                             },
-                                                                                  "body":  {
-                                                                                               "bodyType":  "Form",
-                                                                                               "formBody":  {
-                                                                                                                "overrideContentType":  true,
-                                                                                                                "encoding":  "application/x-www-form-urlencoded",
-                                                                                                                "items":  [
-                                                                                                                              {
-                                                                                                                                  "enabled":  false,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "request_id",
-                                                                                                                                  "value":  "AuthRequestSessionId is carried by Set-Cookie from the authorize response."
-                                                                                                                              },
-                                                                                                                              {
-                                                                                                                                  "enabled":  true,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "email",
-                                                                                                                                  "value":  "${\"Email\"}"
-                                                                                                                              },
-                                                                                                                              {
-                                                                                                                                  "enabled":  true,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "password",
-                                                                                                                                  "value":  "${\"Password\"}"
-                                                                                                                              }
-                                                                                                                          ]
-                                                                                                            }
-                                                                                           },
-                                                                                  "uri":  {
-                                                                                              "host":  "${\"AuthServer\"}",
-                                                                                              "path":  "/login",
-                                                                                              "query":  {
-                                                                                                            "delimiter":  "\u0026",
-                                                                                                            "items":  [
-
-                                                                                                                      ]
-                                                                                                        }
-                                                                                          },
-                                                                                  "headers":  [
-                                                                                                  {
-                                                                                                      "enabled":  true,
-                                                                                                      "name":  "Content-Type",
-                                                                                                      "value":  "application/x-www-form-urlencoded"
-                                                                                                  },
-                                                                                                  {
-                                                                                                      "enabled":  false,
-                                                                                                      "name":  "Cookie",
-                                                                                                      "value":  "Chrome cookie jar carries AuthRequestSessionId from the authorize response. Do not set Cookie manually."
-                                                                                                  }
-                                                                                              ],
-                                                                                  "assertions":  [
-
-                                                                                                 ]
-                                                                              }
-                                                               },
-                                                               {
-                                                                   "entity":  {
-                                                                                  "type":  "Request",
-                                                                                  "id":  "5a65ebbc-470d-4f5b-9da1-6d9b79916d57",
-                                                                                  "name":  "03. Exchange authorization code",
-                                                                                  "method":  {
-                                                                                                 "requestBody":  true,
-                                                                                                 "link":  "https://tools.ietf.org/html/rfc7231#section-4.3",
-                                                                                                 "name":  "POST"
-                                                                                             },
-                                                                                  "body":  {
-                                                                                               "bodyType":  "Form",
-                                                                                               "formBody":  {
-                                                                                                                "overrideContentType":  true,
-                                                                                                                "encoding":  "application/x-www-form-urlencoded",
-                                                                                                                "items":  [
-                                                                                                                              {
-                                                                                                                                  "enabled":  true,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "grant_type",
-                                                                                                                                  "value":  "authorization_code"
-                                                                                                                              },
-                                                                                                                              {
-                                                                                                                                  "enabled":  true,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "client_id",
-                                                                                                                                  "value":  "${\"ClientId\"}"
-                                                                                                                              },
-                                                                                                                              {
-                                                                                                                                  "enabled":  true,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "redirect_uri",
-                                                                                                                                  "value":  "${\"RedirectUri\"}"
-                                                                                                                              },
-                                                                                                                              {
-                                                                                                                                  "enabled":  true,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "code",
-                                                                                                                                  "value":  "${\"AuthFoundation - AuthorizationCodeFlow\".\"02. Login for authorize session\".\"response\".\"body\".\"authorization_code\"}"
-                                                                                                                              },
-                                                                                                                              {
-                                                                                                                                  "enabled":  true,
-                                                                                                                                  "type":  "Text",
-                                                                                                                                  "name":  "code_verifier",
-                                                                                                                                  "value":  "${\"CodeVerifier\"}"
-                                                                                                                              }
-                                                                                                                          ]
-                                                                                                            }
-                                                                                           },
-                                                                                  "uri":  {
-                                                                                              "host":  "${\"AuthServer\"}",
-                                                                                              "path":  "/token",
-                                                                                              "query":  {
-                                                                                                            "delimiter":  "\u0026",
-                                                                                                            "items":  [
-
-                                                                                                                      ]
-                                                                                                        }
-                                                                                          },
-                                                                                  "headers":  [
-                                                                                                  {
-                                                                                                      "enabled":  true,
-                                                                                                      "name":  "Content-Type",
-                                                                                                      "value":  "application/x-www-form-urlencoded"
-                                                                                                  },
-                                                                                                  {
-                                                                                                      "enabled":  true,
-                                                                                                      "name":  "x-flow-type",
-                                                                                                      "value":  "AuthorizationCode"
-                                                                                                  }
-                                                                                              ],
-                                                                                  "assertions":  [
-
-                                                                                                 ]
-                                                                              }
-                                                               }
-                                                           ]
-                                          }
-                                      ]
-                     }
-                 ],
-    "environments":  [
-                         {
-                             "id":  "de1d417b-36af-4ebd-b679-fe25940355fe",
-                             "name":  "production",
-                             "variables":  {
-                                               "a16b0352-4740-43e5-9a2c-b7d1b4d64bc0":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "AuthServer",
-                                                                                            "value":  "https://auth.osolab-auth.jp",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "53d45d4c-bb8e-4b25-bdf6-b98212394a10":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "ClientId",
-                                                                                            "value":  "30000000000000000000000000000001",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "5b277d42-b468-40cc-ab12-0fcc32c619be":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "RedirectUri",
-                                                                                            "value":  "https://taiga.osolab.jp/oidc/callback/",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "55726f21-0b2f-4161-91f5-00cdf6bafdb4":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "Scope",
-                                                                                            "value":  "openid email profile",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "4cfcb84b-c84f-45e7-9dd4-92a11ee14d7d":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "State",
-                                                                                            "value":  "state-production-scenario",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "c746ea6c-b370-4514-b9c2-6018dab8e23d":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "Nonce",
-                                                                                            "value":  "nonce-production-scenario",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "a70732ec-f171-4522-a99d-62466b91af5e":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "CodeVerifier",
-                                                                                            "value":  "production-code-verifier-change-before-run-000000000000000001",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "defde261-5079-4a56-ae5a-249d3b1577ac":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "CodeChallenge",
-                                                                                            "value":  "replace-with-S256-code-challenge-for-CodeVerifier",
-                                                                                            "enabled":  true,
-                                                                                            "private":  false
-                                                                                        },
-                                               "ee97be6f-40aa-4ceb-a7a8-8adc1a0e4940":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "Email",
-                                                                                            "value":  "osolab-api-test@example.com",
-                                                                                            "enabled":  true,
-                                                                                            "private":  true
-                                                                                        },
-                                               "52ed8bc8-d85f-4b7a-b808-f4a3b43b913e":  {
-                                                                                            "createdAt":  "2026-05-31T00:00:00.000+09:00",
-                                                                                            "name":  "Password",
-                                                                                            "value":  "replace-before-run",
-                                                                                            "enabled":  true,
-                                                                                            "private":  true
-                                                                                        }
-                                           }
-                         }
-                     ]
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "3031ac0b-e8e6-4943-a725-cff1eb38e3e8",
+        "name": "AuthFoundation - AuthorizationCodeFlow"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "6c9b2157-c2c3-460c-b18b-21ee98e65886",
+            "name": "AuthorizationCodeFlow",
+            "description": "Production Authorization Code + PKCE scenario. Later steps consume values returned by earlier responses."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "8be5436c-9662-426a-b6d5-cc5a90d38fd2",
+                "name": "00. OpenID configuration",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/.well-known/openid-configuration",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "b9bdc44b-8c41-408c-9986-b34007e12c6c",
+                "name": "01. Start authorize request",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/authorize",
+                  "query": {
+                    "delimiter": "&",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "response_type",
+                        "value": "code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"ClientId\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"RedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "state",
+                        "value": "${\"State\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "scope",
+                        "value": "${\"Scope\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge_method",
+                        "value": "S256"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_challenge",
+                        "value": "${\"CodeChallenge\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "nonce",
+                        "value": "${\"Nonce\"}"
+                      }
+                    ]
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "x-auth-ui-response-mode",
+                    "value": "json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "c0708302-0e1f-4f9b-81cc-6a8e7b2efe51",
+                "name": "02. Login for authorize session",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": false,
+                        "type": "Text",
+                        "name": "request_id",
+                        "value": "AuthRequestSessionId is carried by Set-Cookie from the authorize response."
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "email",
+                        "value": "${\"Email\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "password",
+                        "value": "${\"Password\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/login",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": false,
+                    "name": "Cookie",
+                    "value": "Chrome cookie jar carries AuthRequestSessionId from the authorize response. Do not set Cookie manually."
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "5a65ebbc-470d-4f5b-9da1-6d9b79916d57",
+                "name": "03. Exchange authorization code",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "grant_type",
+                        "value": "authorization_code"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "client_id",
+                        "value": "${\"ClientId\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "redirect_uri",
+                        "value": "${\"RedirectUri\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code",
+                        "value": "${\"AuthFoundation - AuthorizationCodeFlow\".\"02. Login for authorize session\".\"response\".\"body\".\"authorization_code\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code_verifier",
+                        "value": "${\"CodeVerifier\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/token",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "enabled": true,
+                    "name": "x-flow-type",
+                    "value": "AuthorizationCode"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "02e940c4-c7a2-456e-9a64-73cd280f6fa7",
+                "name": "04. Get UserInfo with issued access token",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/userinfo",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Authorization",
+                    "value": "Bearer ${\"AuthFoundation - AuthorizationCodeFlow\".\"03. Exchange authorization code\".\"response\".\"body\".\"access_token\"}"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "4306f58e-766b-4e25-bb53-764b6bf647e5",
+                "name": "05. Get JWKS",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/jwks",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "de1d417b-36af-4ebd-b679-fe25940355fe",
+      "name": "production",
+      "variables": {
+        "a16b0352-4740-43e5-9a2c-b7d1b4d64bc0": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "53d45d4c-bb8e-4b25-bdf6-b98212394a10": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "5b277d42-b468-40cc-ab12-0fcc32c619be": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "55726f21-0b2f-4161-91f5-00cdf6bafdb4": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "4cfcb84b-c84f-45e7-9dd4-92a11ee14d7d": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "c746ea6c-b370-4514-b9c2-6018dab8e23d": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "a70732ec-f171-4522-a99d-62466b91af5e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "defde261-5079-4a56-ae5a-249d3b1577ac": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "ee97be6f-40aa-4ceb-a7a8-8adc1a0e4940": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "52ed8bc8-d85f-4b7a-b808-f4a3b43b913e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        }
+      }
+    }
+  ]
 }
