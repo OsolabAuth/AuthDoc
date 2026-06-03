@@ -1,0 +1,189 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "bce5e8ba-0a0a-4120-bac2-20abbd6a6ca6",
+        "name": "AuthFoundation - HealthCheck"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "6a68f390-d7fb-4443-bfd8-26498b5bab5d",
+            "name": "HealthCheck",
+            "description": "Production health and OIDC metadata smoke scenario."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "537b8f75-adf1-40ab-8505-a5b492ea7546",
+                "name": "01. Live health check",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/health/live",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "d99207f0-02fd-4c72-ab5e-46c3734be817",
+                "name": "02. Ready health check",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/health/ready",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "cfaa7421-89da-41ff-a1e1-4089f83c78f4",
+                "name": "03. OpenID configuration smoke check",
+                "method": {
+                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
+                  "name": "GET"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": []
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/.well-known/openid-configuration",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "e2b0fc19-d928-4d1a-9ec6-36ea85f1e4bc",
+      "name": "production",
+      "variables": {
+        "2f949aa9-c35d-45d5-b82b-e66e612fac2f": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "0525ddc7-937a-4c15-9f3e-5588503c6af8": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "b35329dc-de66-48e0-a0fa-023b8f33fc3b": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "a79a9c72-69db-4538-85ae-eca670fa869a": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "f4fcbe41-605f-4d0d-9557-3187cf486d17": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "07bd96da-ce06-4f1d-a7a6-578d0566763c": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "c0727809-35f2-4f3a-a9bf-0d2f2493bd76": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "f519d533-897d-4342-8276-3daa38cf1d0e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "fd3c95f5-c88c-46f4-940f-373bba9d6e45": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "91b6457e-f50a-4bc7-9c13-0ceb6b223571": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "428d5d60-d080-4c44-b43d-ea2fd41cb0dc",
+        "name": "AuthFoundation - AgentDelegatedAuth"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "a77e3034-1bfa-4a9d-ae95-5b0bb669a44c",
+            "name": "AgentDelegatedAuth",
+            "description": "Production AI agent delegated auth scenario. MFA verify issues a step-up token, agent creation returns agent_secret, and token issuance consumes it."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "b287565b-2a47-4d05-af33-c424a116e037",
+                "name": "01. Start email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"OwnerEmail\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/start",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "0075050f-f41c-407b-8253-7a032ffa4684",
+                "name": "02. Verify email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"OwnerEmail\\\"}\",\n  \"code\": \"${\\\"AuthFoundation - AgentDelegatedAuth\\\".\\\"01. Start email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"code\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/verify",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "4615ef64-e6d3-4f12-ba4b-cd9d727740f7",
+                "name": "03. Create agent delegation",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"owner_email\": \"${\\\"OwnerEmail\\\"}\",\n  \"agent_name\": \"${\\\"AgentName\\\"}\",\n  \"client_id\": \"${\\\"ClientId\\\"}\",\n  \"scope\": \"${\\\"AgentScope\\\"}\",\n  \"expires_days\": 30,\n  \"step_up_token\": \"${\\\"AuthFoundation - AgentDelegatedAuth\\\".\\\"02. Verify email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"step_up_token\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/agent",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "9f5e9de3-6764-492e-8a8c-0d1fcd199975",
+                "name": "04. Issue agent token",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"agent_id\": \"${\\\"AuthFoundation - AgentDelegatedAuth\\\".\\\"03. Create agent delegation\\\".\\\"response\\\".\\\"body\\\".\\\"agent_id\\\"}\",\n  \"agent_secret\": \"${\\\"AuthFoundation - AgentDelegatedAuth\\\".\\\"03. Create agent delegation\\\".\\\"response\\\".\\\"body\\\".\\\"agent_secret\\\"}\",\n  \"client_id\": \"${\\\"ClientId\\\"}\",\n  \"scope\": \"${\\\"AgentScope\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/agent/token",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "8dccf38b-ab28-47e9-b0d8-5f043993fdb9",
+      "name": "production",
+      "variables": {
+        "781fdd33-d7bf-4a9f-8043-a4ff2fb75f20": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "28321e15-859f-48b4-9ec4-62bba3c669df": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "a71f8e2b-f6a5-4d36-98db-c652b5f7565b": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "9c46ea65-23e8-46d3-b6ee-19b3b9473a61": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "f9eda44b-73a2-4c33-8cb1-f47307219493": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "5b0ab330-e89f-4678-9048-80f25bcfd3bf": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "b2fe237a-5871-4ee4-a3d7-4d5f13c1ed91": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "94cac5c8-28f6-41e3-a9cf-034f13d5075e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "efcd1625-9d66-413b-8723-48d327bd8f2d": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "9f4d7f8d-8a73-48bc-87f3-b46e97dfc530": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "8335910f-7a82-49a3-a0d3-bb0f1b2bc2ed": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "OwnerEmail",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "a7d90b98-4d3b-4fe2-bf5e-1d803bd53e59": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AgentName",
+          "value": "Issue Triage Agent",
+          "enabled": true,
+          "private": false
+        },
+        "3e65b03f-7189-4de1-9610-d6fb84b51de7": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AgentScope",
+          "value": "openid profile task.read task.create task.comment",
+          "enabled": true,
+          "private": false
+        }
+      }
+    }
+  ]
+}
