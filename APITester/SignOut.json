@@ -4,51 +4,22 @@
     {
       "entity": {
         "type": "Project",
-        "id": "3031ac0b-e8e6-4943-a725-cff1eb38e3e8",
-        "name": "AuthFoundation - AuthorizationCodeFlow"
+        "id": "9905cf1c-7304-4c86-95f1-8996749413e5",
+        "name": "AuthFoundation - SignOut"
       },
       "children": [
         {
           "entity": {
             "type": "Scenario",
-            "id": "6c9b2157-c2c3-460c-b18b-21ee98e65886",
-            "name": "AuthorizationCodeFlow",
-            "description": "Production Authorization Code + PKCE scenario. Later steps consume values returned by earlier responses."
+            "id": "069012fb-56df-480b-ad9e-6aa2e0b11792",
+            "name": "SignOut",
+            "description": "Production sign-out scenario: login, issue tokens, revoke access token, then logout."
           },
           "children": [
             {
               "entity": {
                 "type": "Request",
-                "id": "8be5436c-9662-426a-b6d5-cc5a90d38fd2",
-                "name": "00. OpenID configuration",
-                "method": {
-                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
-                  "name": "GET"
-                },
-                "body": {
-                  "bodyType": "Text",
-                  "formBody": {
-                    "overrideContentType": true,
-                    "encoding": "application/x-www-form-urlencoded",
-                    "items": []
-                  }
-                },
-                "uri": {
-                  "host": "${\"AuthServer\"}",
-                  "path": "/.well-known/openid-configuration",
-                  "query": {
-                    "delimiter": "&",
-                    "items": []
-                  }
-                },
-                "headers": [],
-                "assertions": []
-              }
-            },
-            {
-              "entity": {
-                "type": "Request",
-                "id": "b9bdc44b-8c41-408c-9986-b34007e12c6c",
+                "id": "e7d796a5-4048-4351-91fe-4f28551e58d4",
                 "name": "01. Start authorize request",
                 "method": {
                   "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
@@ -132,7 +103,7 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "c0708302-0e1f-4f9b-81cc-6a8e7b2efe51",
+                "id": "c2777f9a-cb5e-4b45-822e-2aac56d85f5a",
                 "name": "02. Login for authorize session",
                 "method": {
                   "requestBody": true,
@@ -192,7 +163,7 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "5a65ebbc-470d-4f5b-9da1-6d9b79916d57",
+                "id": "7f67906c-df09-4998-9bee-4bbeeecf94ff",
                 "name": "03. Exchange authorization code",
                 "method": {
                   "requestBody": true,
@@ -227,7 +198,7 @@
                         "enabled": true,
                         "type": "Text",
                         "name": "code",
-                        "value": "${\"AuthFoundation - AuthorizationCodeFlow\".\"02. Login for authorize session\".\"response\".\"body\".\"authorization_code\"}"
+                        "value": "${\"AuthFoundation - SignOut\".\"02. Login for authorize session\".\"response\".\"body\".\"authorization_code\"}"
                       },
                       {
                         "enabled": true,
@@ -264,23 +235,31 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "02e940c4-c7a2-456e-9a64-73cd280f6fa7",
-                "name": "04. Get UserInfo with issued access token",
+                "id": "a7cf092b-972f-401c-abb3-c1d41648cbbb",
+                "name": "04. Revoke issued access token",
                 "method": {
-                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
-                  "name": "GET"
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
                 },
                 "body": {
-                  "bodyType": "Text",
+                  "bodyType": "Form",
                   "formBody": {
                     "overrideContentType": true,
                     "encoding": "application/x-www-form-urlencoded",
-                    "items": []
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "token",
+                        "value": "${\"AuthFoundation - SignOut\".\"03. Exchange authorization code\".\"response\".\"body\".\"access_token\"}"
+                      }
+                    ]
                   }
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
-                  "path": "/userinfo",
+                  "path": "/revoke",
                   "query": {
                     "delimiter": "&",
                     "items": []
@@ -289,8 +268,8 @@
                 "headers": [
                   {
                     "enabled": true,
-                    "name": "Authorization",
-                    "value": "Bearer ${\"AuthFoundation - AuthorizationCodeFlow\".\"03. Exchange authorization code\".\"response\".\"body\".\"access_token\"}"
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
                   }
                 ],
                 "assertions": []
@@ -299,29 +278,43 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "4306f58e-766b-4e25-bb53-764b6bf647e5",
-                "name": "05. Get JWKS",
+                "id": "d5bef973-4952-4eca-8a88-77e792938018",
+                "name": "05. Logout current auth session",
                 "method": {
-                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
-                  "name": "GET"
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
                 },
                 "body": {
-                  "bodyType": "Text",
+                  "bodyType": "Form",
                   "formBody": {
                     "overrideContentType": true,
                     "encoding": "application/x-www-form-urlencoded",
-                    "items": []
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "logout_all",
+                        "value": "false"
+                      }
+                    ]
                   }
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
-                  "path": "/jwks",
+                  "path": "/logout",
                   "query": {
                     "delimiter": "&",
                     "items": []
                   }
                 },
-                "headers": [],
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
                 "assertions": []
               }
             }
@@ -332,73 +325,73 @@
   ],
   "environments": [
     {
-      "id": "de1d417b-36af-4ebd-b679-fe25940355fe",
+      "id": "79a02d46-82ff-49a9-91d0-fa75111c140e",
       "name": "production",
       "variables": {
-        "a16b0352-4740-43e5-9a2c-b7d1b4d64bc0": {
+        "823a624d-fa9a-4dff-924d-68d3e123ae58": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "AuthServer",
           "value": "https://auth.osolab-auth.jp",
           "enabled": true,
           "private": false
         },
-        "53d45d4c-bb8e-4b25-bdf6-b98212394a10": {
+        "7345fa0c-5bda-4c71-82b1-51d00e697b7e": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "ClientId",
           "value": "30000000000000000000000000000001",
           "enabled": true,
           "private": false
         },
-        "5b277d42-b468-40cc-ab12-0fcc32c619be": {
+        "dddd4d80-de08-461c-a05a-32f230adb75e": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "RedirectUri",
           "value": "https://taiga.osolab.jp/oidc/callback/",
           "enabled": true,
           "private": false
         },
-        "55726f21-0b2f-4161-91f5-00cdf6bafdb4": {
+        "ba5d5439-2184-472b-8e82-38e31c9630fa": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Scope",
           "value": "openid email profile",
           "enabled": true,
           "private": false
         },
-        "4cfcb84b-c84f-45e7-9dd4-92a11ee14d7d": {
+        "3553e7c5-55cc-45f5-b79d-d2824539a2d1": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "State",
           "value": "state-production-scenario",
           "enabled": true,
           "private": false
         },
-        "c746ea6c-b370-4514-b9c2-6018dab8e23d": {
+        "ed55fda9-a47e-4a2d-9ad8-87b1b2ee34f5": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Nonce",
           "value": "nonce-production-scenario",
           "enabled": true,
           "private": false
         },
-        "a70732ec-f171-4522-a99d-62466b91af5e": {
+        "f816c67f-cec7-4f08-af30-a7fb5379d8d8": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "CodeVerifier",
           "value": "production-code-verifier-change-before-run-000000000000000001",
           "enabled": true,
           "private": false
         },
-        "defde261-5079-4a56-ae5a-249d3b1577ac": {
+        "8a561d9e-8521-42e2-bad3-f2d8c0154a80": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "CodeChallenge",
           "value": "replace-with-S256-code-challenge-for-CodeVerifier",
           "enabled": true,
           "private": false
         },
-        "ee97be6f-40aa-4ceb-a7a8-8adc1a0e4940": {
+        "9b61d3f6-0d03-408e-9a06-dd24e65d4023": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Email",
           "value": "osolab-api-test@example.com",
           "enabled": true,
           "private": true
         },
-        "52ed8bc8-d85f-4b7a-b808-f4a3b43b913e": {
+        "42f082f7-a3fb-4796-a5a7-51d366fecca0": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Password",
           "value": "replace-before-run",
