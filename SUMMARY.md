@@ -13,6 +13,8 @@
 * [POST /account/password](API/PostAccountPassword.md)
 * [POST /account/withdrawal](API/PostAccountWithdrawal.md)
 * [POST /agent](API/PostAgent.md)
+* [POST /agent/{agent_id}/revoke](API/PostAgentRevoke.md)
+* [POST /agent/{agent_id}/secret](API/PostAgentSecret.md)
 * [POST /agent/token](API/PostAgentToken.md)
 * [PostLogin](API/PostLogin.md)
 * [PostLogout](API/PostLogout.md)
@@ -33,6 +35,7 @@
 * [パスワードリセットフロー](Architecture/Account/PasswordReset.md)
 * [退会フロー](Architecture/Account/Withdrawal.md)
 * [AIエージェント委譲認証設計](Architecture/Agent/DelegatedAuth.md)
+* [AI Agent Secret Management](Architecture/Agent/SecretManagement.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)
