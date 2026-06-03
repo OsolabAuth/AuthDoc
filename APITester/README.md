@@ -16,6 +16,8 @@ The default environment is `production` and points at:
 | `Scope` | `openid email profile` | Requested OIDC scope |
 | `CodeVerifier` / `CodeChallenge` | replace before run | Generate a valid S256 PKCE pair before running auth scenarios |
 | `Email` / `Password` | replace before run | Use only a dedicated production test account |
+| `OwnerEmail` / `AgentName` / `AgentScope` | replace before run | Used by AI agent delegation scenarios |
+| `AgentBasicCredential` | replace before `/agent/me` check | Base64 of `agent_id:agent_secret` from the create-agent response |
 
 Do not run destructive scenarios such as `Withdrawal.json` against a real user account.
 
