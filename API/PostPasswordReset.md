@@ -67,8 +67,24 @@ Returned when the user does not exist, birth date does not match, or the email c
 }
 ```
 
+### Too Many Requests
+
+Returned when password reset verification fails repeatedly for the same login email address, IP address, or email challenge.
+
+```json
+{
+  "response_code": "00010",
+  "message": "too many requests",
+  "error": "too_many_requests",
+  "error_code": "00010",
+  "error_description": "too many requests"
+}
+```
+
 ## Security Notes
 
 - Password reset must not rely on birth date alone.
 - The email code must be delivered to the login email address and must not be returned by `POST /mfa/email/start`.
+- The email code must be verified before comparing `birth_date`.
+- Repeated reset failures must be rate limited.
 - The password must not be changed when birth date or email code verification fails.
