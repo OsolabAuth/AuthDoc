@@ -92,7 +92,7 @@
                 },
                 "body": {
                   "bodyType": "Text",
-                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\"\n}"
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"step_up_token\": \"${\\\"AuthFoundation - MfaStepUp\\\".\\\"02. Verify email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"step_up_token\\\"}\"\n}"
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
