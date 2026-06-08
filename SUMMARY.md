@@ -63,6 +63,7 @@
 ## ScreenDesign
 * [クライアント登録画面設計](ScreenDesign/ClientRegisterScreenDesign.md)
 * [AI Agent Management Screen](ScreenDesign/AgentManagementScreenDesign.md)
+* [AI Agent Token Inspector](ScreenDesign/AgentTokenInspector.md)
 * [JWK鍵管理設計](ScreenDesign/JwkKeyManagement.md)
 * [認証画面設計](ScreenDesign/LoginScreenDesign.md)
 * [AuthPortal Production Hardening](ScreenDesign/PortalProductionHardening.md)
