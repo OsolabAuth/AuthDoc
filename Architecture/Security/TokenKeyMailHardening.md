@@ -95,6 +95,7 @@ IEmailSender
 制限対象:
 
 - email MFA verify
+- authenticator TOTP verify
 - step-up token validate
 - agent secret validate
 
@@ -154,3 +155,30 @@ window = 5 minutes
 - AuthFoundation のインメモリ実装を対象にする。
 - 外部メール送信API、KMS連携、Redis rate limit は今回含めない。
 - API Testerはメール送信の実配送がないため、Unit Testで保証する。
+
+## Review Clarifications
+
+### Authenticator TOTP attempt limit
+
+`POST /mfa/authenticator/verify` is part of the same step-up boundary as email MFA verification.
+Failed TOTP verification attempts must be counted by at least login email address and request IP address.
+After the configured limit is exceeded, further attempts in the same window are rejected before TOTP comparison.
+
+Initial policy:
+
+```text
+max_attempts = 5
+window = 5 minutes
+```
+
+### UserInfo and agent tokens
+
+`GET /userinfo` accepts only user access tokens that include the `openid` scope.
+AI agent access tokens are opaque resource-server tokens and must not be accepted by the OIDC UserInfo endpoint.
+Agent-facing identity information is represented by the agent ID token and `/agent/me`, not `/userinfo`.
+
+UserInfo claims are returned by scope:
+
+- `sub` is always returned for a valid user access token with `openid`.
+- `email` is returned only when the access token includes `email`.
+- `name` is returned only when the access token includes `profile`.

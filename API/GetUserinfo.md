@@ -91,3 +91,24 @@ end
 | 400 | invalid_request | 00001 | リクエストパラメータエラー |
 | 401 | invalid_token | 00008 | アクセストークンが無効です |
 | 500 | server_error | 90000 | サーバーで予期しないエラーが発生しました |
+
+## Review Clarifications
+
+### Accepted principal type
+
+`GET /userinfo` accepts only access tokens for a human user principal.
+Tokens with `principal_type = ai_agent` are rejected with `401 invalid_token`.
+
+AI agent identity is exposed through the agent ID token and agent-specific APIs, not through the OIDC UserInfo endpoint.
+
+### Scope gated claims
+
+The UserInfo response is limited by the access token scope.
+
+| Claim | Condition |
+| --- | --- |
+| `sub` | Valid user access token with `openid` |
+| `email` | `email` scope |
+| `name` | `profile` scope |
+
+If the token has `openid` only, the response contains `sub` only.
