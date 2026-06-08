@@ -14,6 +14,6 @@
 
 ## 初期スコープ
 
-- task.read
-- task.create
-- task.comment
+- task_read
+- task_create
+- task_comment
