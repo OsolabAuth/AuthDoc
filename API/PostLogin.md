@@ -52,6 +52,16 @@ POST /login
 | 1. | result | 処理結果 | string | - | ○ | `redirect` / `logged_in` | `logged_in` は認可セッションなしでログインのみ成功した場合 |
 | 2. | response_code | レスポンスコード | string | 5 | ○ | `^[0-9]{5}$` | 正常時 `00000`、認可セッション切れ時 `00006` |
 | 3. | message | メッセージ | string | - | ○ | - | - |
+| 4. | authorization_code | 認可コード | string | - | - | - | 認可セッションを再開できた場合のみ返却。API Testerはこの値を `/token` の `code` に渡す |
+
+#### 1.2.3. API Tester note
+
+When `/login` resumes a valid authorization request session, the JSON body includes `authorization_code` in addition to the redirect URL/Location information.
+Talend API Tester scenarios use this value directly:
+
+```text
+${"AuthFoundation - AuthorizationCodeFlow"."02. Login for authorize session"."response"."body"."authorization_code"}
+```
 
 ## 2. API詳細
 
