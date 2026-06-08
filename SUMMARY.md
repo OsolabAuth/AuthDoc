@@ -72,3 +72,6 @@
 * [Sign-out / Token Revocation Flow](Sequence/SignOut.md)
 * [Signup Flow](Sequence/Signup.md)
 * [Signup Flow (Summary)](Sequence/SignupSimple.md)
+
+## Testing
+* [API Tester Scenario Design](Testing/ApiTesterScenarios.md)
