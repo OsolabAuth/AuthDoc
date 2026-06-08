@@ -13,7 +13,7 @@
             "type": "Scenario",
             "id": "a393d0a0-cd5f-4b55-a873-3710c02704f3",
             "name": "MfaStepUp",
-            "description": "Production MFA scenario. The email verification step consumes the development/test code returned by the start step."
+            "description": "Production MFA scenario. Enter the email verification code received by mail into the private EmailCode environment variable before running the verify step."
           },
           "children": [
             {
@@ -60,7 +60,7 @@
                 },
                 "body": {
                   "bodyType": "Text",
-                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"code\": \"${\\\"AuthFoundation - MfaStepUp\\\".\\\"01. Start email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"code\\\"}\"\n}"
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"code\": \"${\\\"EmailCode\\\"}\"\n}"
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
@@ -220,6 +220,13 @@
         "23a85d26-a809-41c1-86b9-6e978daffb59": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "e0b6385b-8c54-4b01-9c37-e8c19b805671": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "EmailCode",
           "value": "replace-before-run",
           "enabled": true,
           "private": true

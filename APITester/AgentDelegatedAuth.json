@@ -60,7 +60,7 @@
                 },
                 "body": {
                   "bodyType": "Text",
-                  "textBody": "{\n  \"email\": \"${\\\"OwnerEmail\\\"}\",\n  \"code\": \"${\\\"AuthFoundation - AgentDelegatedAuth\\\".\\\"01. Start email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"code\\\"}\"\n}"
+                  "textBody": "{\n  \"email\": \"${\\\"OwnerEmail\\\"}\",\n  \"code\": \"${\\\"EmailCode\\\"}\"\n}"
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
@@ -220,6 +220,13 @@
         "9f4d7f8d-8a73-48bc-87f3-b46e97dfc530": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "79df9369-7c14-462b-b42b-9229ea623a7b": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "EmailCode",
           "value": "replace-before-run",
           "enabled": true,
           "private": true
