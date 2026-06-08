@@ -16,6 +16,7 @@ The default environment is `production` and points at:
 | `Scope` | `openid email profile` | Requested OIDC scope |
 | `CodeVerifier` / `CodeChallenge` | replace before run | Generate a valid S256 PKCE pair before running auth scenarios |
 | `Email` / `Password` | replace before run | Use only a dedicated production test account |
+| `SignupEmailCode` | replace before run | Enter the signup verification code received by mail before running `Signup.json` step 03 |
 
 Do not run destructive scenarios such as `Withdrawal.json` against a real user account.
 

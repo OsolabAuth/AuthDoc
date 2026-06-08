@@ -49,19 +49,30 @@
               "entity": {
                 "type": "Request",
                 "id": "88463158-726b-4b72-9578-000f93b22b7b",
-                "name": "02. Create signup account",
+                "name": "02. Start signup email verification",
                 "method": {
                   "requestBody": true,
                   "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
                   "name": "POST"
                 },
                 "body": {
-                  "bodyType": "Text",
-                  "textBody": "{\n  \"email\": \"${\\\"SignupEmail\\\"}\",\n  \"password\": \"${\\\"SignupPassword\\\"}\",\n  \"name\": \"${\\\"Name\\\"}\",\n  \"birth_date\": \"${\\\"BirthDate\\\"}\",\n  \"terms_accepted\": true,\n  \"accepted_terms_id\": \"${\\\"AuthFoundation - Signup\\\".\\\"01. Get current terms\\\".\\\"response\\\".\\\"body\\\".\\\"terms_id\\\"}\"\n}"
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "email",
+                        "value": "${\"SignupEmail\"}"
+                      }
+                    ]
+                  }
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
-                  "path": "/signup",
+                  "path": "/signup/email",
                   "query": {
                     "delimiter": "&",
                     "items": []
@@ -71,7 +82,105 @@
                   {
                     "enabled": true,
                     "name": "Content-Type",
-                    "value": "application/json"
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "40e971c7-6ef7-4c50-a97f-2c020a1bf203",
+                "name": "03. Verify signup email code",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code",
+                        "value": "${\"SignupEmailCode\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/signup/verify",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "c7c9054c-9a77-4a06-ad5f-aef20f3918d4",
+                "name": "04. Create verified signup account",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "password",
+                        "value": "${\"SignupPassword\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "name",
+                        "value": "${\"Name\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "birthdate",
+                        "value": "${\"BirthDate\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/signup/account",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
                   }
                 ],
                 "assertions": []
@@ -81,7 +190,7 @@
               "entity": {
                 "type": "Request",
                 "id": "ce280394-d27a-4b37-8327-acd25147bbb3",
-                "name": "03. Start authorize request for signup user",
+                "name": "05. Start authorize request for signup user",
                 "method": {
                   "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
                   "name": "GET"
@@ -165,7 +274,7 @@
               "entity": {
                 "type": "Request",
                 "id": "d0d7e003-7ce7-4c6d-83d7-350aa97d0a0a",
-                "name": "04. Login with created signup user",
+                "name": "06. Login with created signup user",
                 "method": {
                   "requestBody": true,
                   "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
@@ -225,7 +334,7 @@
               "entity": {
                 "type": "Request",
                 "id": "9ce75316-3355-4a07-9d2c-41ff0240b43e",
-                "name": "05. Exchange signup user authorization code",
+                "name": "07. Exchange signup user authorization code",
                 "method": {
                   "requestBody": true,
                   "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
@@ -259,7 +368,7 @@
                         "enabled": true,
                         "type": "Text",
                         "name": "code",
-                        "value": "${\"AuthFoundation - Signup\".\"04. Login with created signup user\".\"response\".\"body\".\"authorization_code\"}"
+                        "value": "${\"AuthFoundation - Signup\".\"06. Login with created signup user\".\"response\".\"body\".\"authorization_code\"}"
                       },
                       {
                         "enabled": true,
@@ -297,7 +406,7 @@
               "entity": {
                 "type": "Request",
                 "id": "c9bd9d15-08bc-41ab-89c7-f48d36bb0ac9",
-                "name": "06. Get UserInfo for signup user",
+                "name": "08. Get UserInfo for signup user",
                 "method": {
                   "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
                   "name": "GET"
@@ -322,7 +431,7 @@
                   {
                     "enabled": true,
                     "name": "Authorization",
-                    "value": "Bearer ${\"AuthFoundation - Signup\".\"05. Exchange signup user authorization code\".\"response\".\"body\".\"access_token\"}"
+                    "value": "Bearer ${\"AuthFoundation - Signup\".\"07. Exchange signup user authorization code\".\"response\".\"body\".\"access_token\"}"
                   }
                 ],
                 "assertions": []
@@ -418,6 +527,13 @@
         "7dd1a027-83ba-4ec3-b4bd-375d0be59bc5": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "SignupPassword",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "7789a967-7d03-44f1-949d-748619f0f3ad": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "SignupEmailCode",
           "value": "replace-before-run",
           "enabled": true,
           "private": true
