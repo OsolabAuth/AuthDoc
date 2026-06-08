@@ -42,10 +42,10 @@ Common references used by these scenarios:
 | --- | --- |
 | Authorization code | `${"AuthFoundation - AuthorizationCodeFlow"."02. Login for authorize session"."response"."body"."authorization_code"}` |
 | Access token | `${"AuthFoundation - AuthorizationCodeFlow"."03. Exchange authorization code"."response"."body"."access_token"}` |
-| MFA code in development/test response | `${"AuthFoundation - MfaStepUp"."01. Start email MFA"."response"."body"."code"}` |
+| MFA email code | `${"EmailCode"}` |
 | Step-up token | `${"AuthFoundation - MfaStepUp"."02. Verify email MFA"."response"."body"."step_up_token"}` |
 
 Do not add a manual `Cookie` header to the login request. The authorize response sets `AuthRequestSessionId`; Talend API Tester should let Chrome carry that cookie to `/login`.
 
-If production stops returning a debug value such as an email MFA code, enter the code received by mail manually for that verification request.
+Email MFA codes are never read from `/mfa/email/start` responses. Enter the code received by mail manually into the private `EmailCode` environment variable for verification requests.
 

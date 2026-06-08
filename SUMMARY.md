@@ -37,6 +37,7 @@
 * [AIエージェント委譲認証設計](Architecture/Agent/DelegatedAuth.md)
 * [AI Agent Delegated Scope Policy](Architecture/Agent/ScopePolicy.md)
 * [AI Agent Secret Management](Architecture/Agent/SecretManagement.md)
+* [MFA Email Code Hardening](Architecture/Security/MfaEmailCodeHardening.md)
 
 ## Data
 * [認証基盤のCookie設計](Data/Cookie.md)

@@ -60,7 +60,7 @@
                 },
                 "body": {
                   "bodyType": "Text",
-                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"code\": \"${\\\"AuthFoundation - Withdrawal\\\".\\\"01. Start email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"code\\\"}\"\n}"
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"code\": \"${\\\"EmailCode\\\"}\"\n}"
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
@@ -182,6 +182,13 @@
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Email",
           "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "f0ddf3a2-cff3-403d-aac2-9a405563f3cd": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "EmailCode",
+          "value": "replace-before-run",
           "enabled": true,
           "private": true
         },
