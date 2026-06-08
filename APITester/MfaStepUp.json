@@ -1,0 +1,237 @@
+{
+  "version": 6,
+  "entities": [
+    {
+      "entity": {
+        "type": "Project",
+        "id": "de965804-163f-4a04-910b-b32485194a29",
+        "name": "AuthFoundation - MfaStepUp"
+      },
+      "children": [
+        {
+          "entity": {
+            "type": "Scenario",
+            "id": "a393d0a0-cd5f-4b55-a873-3710c02704f3",
+            "name": "MfaStepUp",
+            "description": "Production MFA scenario. The email verification step consumes the development/test code returned by the start step."
+          },
+          "children": [
+            {
+              "entity": {
+                "type": "Request",
+                "id": "2eb33af3-bcce-4834-b294-80aa66f61bd4",
+                "name": "01. Start email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/start",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "350e4035-de96-47cc-855a-d7a8343a555d",
+                "name": "02. Verify email MFA",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"code\": \"${\\\"AuthFoundation - MfaStepUp\\\".\\\"01. Start email MFA\\\".\\\"response\\\".\\\"body\\\".\\\"code\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/email/verify",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "d4eb164b-23b4-4053-942f-0cb0eb7de0bd",
+                "name": "03. Authenticator setup",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/authenticator/setup",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "19a1dc5a-7ea2-4fe4-a9b4-121b874ebefa",
+                "name": "04. Verify authenticator code",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Text",
+                  "textBody": "{\n  \"email\": \"${\\\"Email\\\"}\",\n  \"code\": \"${\\\"TotpCode\\\"}\"\n}"
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/mfa/authenticator/verify",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "assertions": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "21357a7f-48f7-4778-98bd-d46e59492f5d",
+      "name": "production",
+      "variables": {
+        "e9c89cff-c846-430e-bf18-b0a0bd8091c7": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "AuthServer",
+          "value": "https://auth.osolab-auth.jp",
+          "enabled": true,
+          "private": false
+        },
+        "6a4e9632-291f-4605-90f0-44e8a6b0aa26": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "ClientId",
+          "value": "30000000000000000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "4f723ff8-c8b9-4b61-8b70-93e100d656d8": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "RedirectUri",
+          "value": "https://taiga.osolab.jp/oidc/callback/",
+          "enabled": true,
+          "private": false
+        },
+        "8bccb6c0-218d-4d5d-b7b7-6280f6a5dea7": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Scope",
+          "value": "openid email profile",
+          "enabled": true,
+          "private": false
+        },
+        "190e1147-8f2f-47e9-9968-670dcb989619": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "State",
+          "value": "state-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "c3c40c4d-19a1-43c5-be3e-3ae665c27ebe": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Nonce",
+          "value": "nonce-production-scenario",
+          "enabled": true,
+          "private": false
+        },
+        "50d2edbb-f889-44f8-a9af-96e80607300d": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeVerifier",
+          "value": "production-code-verifier-change-before-run-000000000000000001",
+          "enabled": true,
+          "private": false
+        },
+        "e4668b62-b004-4d48-95b0-9c59b5be8117": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "CodeChallenge",
+          "value": "replace-with-S256-code-challenge-for-CodeVerifier",
+          "enabled": true,
+          "private": false
+        },
+        "8c0f3ee1-845d-445b-bdfc-66aa55afa343": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Email",
+          "value": "osolab-api-test@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "23a85d26-a809-41c1-86b9-6e978daffb59": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Password",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "489ac0d4-fd58-4052-89f2-dee23a2f1445": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "TotpCode",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        }
+      }
+    }
+  ]
+}
