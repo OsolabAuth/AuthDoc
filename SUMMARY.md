@@ -34,6 +34,7 @@
 
 ## Architecture
 
+* [Runtime State Policy](Architecture/RuntimeStatePolicy.md)
 * [パスワード変更設計](Architecture/Account/PasswordChange.md)
 * [パスワードリセット設計](Architecture/Account/PasswordReset.md)
 * [退会設計](Architecture/Account/Withdrawal.md)
