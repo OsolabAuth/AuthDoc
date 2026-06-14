@@ -1,0 +1,17 @@
+name: osolab-authdoc-local
+
+services:
+  docs:
+    image: node:24-slim
+    container_name: osolab-authdoc
+    working_dir: /app
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+      - docs-node-modules:/app/node_modules
+    command: >
+      sh -lc "npm install && npx honkit serve . _book --host 0.0.0.0 --port 4000"
+
+volumes:
+  docs-node-modules:

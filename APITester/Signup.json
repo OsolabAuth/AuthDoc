@@ -4,23 +4,23 @@
     {
       "entity": {
         "type": "Project",
-        "id": "3031ac0b-e8e6-4943-a725-cff1eb38e3e8",
-        "name": "AuthFoundation - AuthorizationCodeFlow"
+        "id": "d3cbdafd-ab14-455c-b082-86aa796e9fa1",
+        "name": "AuthFoundation - Signup"
       },
       "children": [
         {
           "entity": {
             "type": "Scenario",
-            "id": "6c9b2157-c2c3-460c-b18b-21ee98e65886",
-            "name": "AuthorizationCodeFlow",
-            "description": "Production Authorization Code + PKCE scenario. Later steps consume values returned by earlier responses."
+            "id": "422c1f29-998f-491e-a464-4cc2adefd5fd",
+            "name": "Signup",
+            "description": "Production signup scenario: read current terms, create a user, then login through Authorization Code + PKCE."
           },
           "children": [
             {
               "entity": {
                 "type": "Request",
-                "id": "8be5436c-9662-426a-b6d5-cc5a90d38fd2",
-                "name": "00. OpenID configuration",
+                "id": "a4e839d4-3efd-4d05-b102-16cc7549928a",
+                "name": "01. Get current terms",
                 "method": {
                   "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
                   "name": "GET"
@@ -35,7 +35,7 @@
                 },
                 "uri": {
                   "host": "${\"AuthServer\"}",
-                  "path": "/.well-known/openid-configuration",
+                  "path": "/terms/current",
                   "query": {
                     "delimiter": "&",
                     "items": []
@@ -48,8 +48,149 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "b9bdc44b-8c41-408c-9986-b34007e12c6c",
-                "name": "01. Start authorize request",
+                "id": "88463158-726b-4b72-9578-000f93b22b7b",
+                "name": "02. Start signup email verification",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "email",
+                        "value": "${\"SignupEmail\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/signup/email",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "40e971c7-6ef7-4c50-a97f-2c020a1bf203",
+                "name": "03. Verify signup email code",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "code",
+                        "value": "${\"SignupEmailCode\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/signup/verify",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "c7c9054c-9a77-4a06-ad5f-aef20f3918d4",
+                "name": "04. Create verified signup account",
+                "method": {
+                  "requestBody": true,
+                  "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
+                  "name": "POST"
+                },
+                "body": {
+                  "bodyType": "Form",
+                  "formBody": {
+                    "overrideContentType": true,
+                    "encoding": "application/x-www-form-urlencoded",
+                    "items": [
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "password",
+                        "value": "${\"SignupPassword\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "name",
+                        "value": "${\"Name\"}"
+                      },
+                      {
+                        "enabled": true,
+                        "type": "Text",
+                        "name": "birthdate",
+                        "value": "${\"BirthDate\"}"
+                      }
+                    ]
+                  }
+                },
+                "uri": {
+                  "host": "${\"AuthServer\"}",
+                  "path": "/signup/account",
+                  "query": {
+                    "delimiter": "&",
+                    "items": []
+                  }
+                },
+                "headers": [
+                  {
+                    "enabled": true,
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "assertions": []
+              }
+            },
+            {
+              "entity": {
+                "type": "Request",
+                "id": "ce280394-d27a-4b37-8327-acd25147bbb3",
+                "name": "05. Start authorize request for signup user",
                 "method": {
                   "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
                   "name": "GET"
@@ -132,8 +273,8 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "c0708302-0e1f-4f9b-81cc-6a8e7b2efe51",
-                "name": "02. Login for authorize session",
+                "id": "d0d7e003-7ce7-4c6d-83d7-350aa97d0a0a",
+                "name": "06. Login with created signup user",
                 "method": {
                   "requestBody": true,
                   "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
@@ -155,13 +296,13 @@
                         "enabled": true,
                         "type": "Text",
                         "name": "email",
-                        "value": "${\"Email\"}"
+                        "value": "${\"SignupEmail\"}"
                       },
                       {
                         "enabled": true,
                         "type": "Text",
                         "name": "password",
-                        "value": "${\"Password\"}"
+                        "value": "${\"SignupPassword\"}"
                       }
                     ]
                   }
@@ -192,8 +333,8 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "5a65ebbc-470d-4f5b-9da1-6d9b79916d57",
-                "name": "03. Exchange authorization code",
+                "id": "9ce75316-3355-4a07-9d2c-41ff0240b43e",
+                "name": "07. Exchange signup user authorization code",
                 "method": {
                   "requestBody": true,
                   "link": "https://tools.ietf.org/html/rfc7231#section-4.3",
@@ -227,7 +368,7 @@
                         "enabled": true,
                         "type": "Text",
                         "name": "code",
-                        "value": "${\"AuthFoundation - AuthorizationCodeFlow\".\"02. Login for authorize session\".\"response\".\"body\".\"authorization_code\"}"
+                        "value": "${\"AuthFoundation - Signup\".\"06. Login with created signup user\".\"response\".\"body\".\"authorization_code\"}"
                       },
                       {
                         "enabled": true,
@@ -264,8 +405,8 @@
             {
               "entity": {
                 "type": "Request",
-                "id": "02e940c4-c7a2-456e-9a64-73cd280f6fa7",
-                "name": "04. Get UserInfo with issued access token",
+                "id": "c9bd9d15-08bc-41ab-89c7-f48d36bb0ac9",
+                "name": "08. Get UserInfo for signup user",
                 "method": {
                   "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
                   "name": "GET"
@@ -290,38 +431,9 @@
                   {
                     "enabled": true,
                     "name": "Authorization",
-                    "value": "Bearer ${\"AuthFoundation - AuthorizationCodeFlow\".\"03. Exchange authorization code\".\"response\".\"body\".\"access_token\"}"
+                    "value": "Bearer ${\"AuthFoundation - Signup\".\"07. Exchange signup user authorization code\".\"response\".\"body\".\"access_token\"}"
                   }
                 ],
-                "assertions": []
-              }
-            },
-            {
-              "entity": {
-                "type": "Request",
-                "id": "4306f58e-766b-4e25-bb53-764b6bf647e5",
-                "name": "05. Get JWKS",
-                "method": {
-                  "link": "http://tools.ietf.org/html/rfc7231#section-4.3.1",
-                  "name": "GET"
-                },
-                "body": {
-                  "bodyType": "Text",
-                  "formBody": {
-                    "overrideContentType": true,
-                    "encoding": "application/x-www-form-urlencoded",
-                    "items": []
-                  }
-                },
-                "uri": {
-                  "host": "${\"AuthServer\"}",
-                  "path": "/jwks",
-                  "query": {
-                    "delimiter": "&",
-                    "items": []
-                  }
-                },
-                "headers": [],
                 "assertions": []
               }
             }
@@ -332,78 +444,113 @@
   ],
   "environments": [
     {
-      "id": "de1d417b-36af-4ebd-b679-fe25940355fe",
+      "id": "84e6f184-0ba0-4846-81d5-88146a85c058",
       "name": "production",
       "variables": {
-        "a16b0352-4740-43e5-9a2c-b7d1b4d64bc0": {
+        "14474ad9-6506-4460-b5e6-8ed717ef98fb": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "AuthServer",
           "value": "https://auth.osolab-auth.jp",
           "enabled": true,
           "private": false
         },
-        "53d45d4c-bb8e-4b25-bdf6-b98212394a10": {
+        "4dfd7fd8-c1cc-41a8-ba9e-65f430776321": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "ClientId",
           "value": "30000000000000000000000000000001",
           "enabled": true,
           "private": false
         },
-        "5b277d42-b468-40cc-ab12-0fcc32c619be": {
+        "d2b10af9-53e5-4b13-9048-690ab531f9a8": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "RedirectUri",
           "value": "https://taiga.osolab.jp/oidc/callback/",
           "enabled": true,
           "private": false
         },
-        "55726f21-0b2f-4161-91f5-00cdf6bafdb4": {
+        "e4f68143-2205-4ff1-8e45-0d3896f228b2": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Scope",
           "value": "openid email profile",
           "enabled": true,
           "private": false
         },
-        "4cfcb84b-c84f-45e7-9dd4-92a11ee14d7d": {
+        "86fce0ba-13b6-4d70-912f-4906cc58c77d": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "State",
           "value": "state-production-scenario",
           "enabled": true,
           "private": false
         },
-        "c746ea6c-b370-4514-b9c2-6018dab8e23d": {
+        "a06e426c-f2c7-4646-acf4-7ffac1788e6b": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Nonce",
           "value": "nonce-production-scenario",
           "enabled": true,
           "private": false
         },
-        "a70732ec-f171-4522-a99d-62466b91af5e": {
+        "ca49adef-221f-4391-ac0a-17082fec5111": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "CodeVerifier",
           "value": "production-code-verifier-change-before-run-000000000000000001",
           "enabled": true,
           "private": false
         },
-        "defde261-5079-4a56-ae5a-249d3b1577ac": {
+        "17f20eaf-3269-49d5-a2a2-b2bae0d944d0": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "CodeChallenge",
           "value": "replace-with-S256-code-challenge-for-CodeVerifier",
           "enabled": true,
           "private": false
         },
-        "ee97be6f-40aa-4ceb-a7a8-8adc1a0e4940": {
+        "e606de5b-498d-4607-aa2b-9987da6ed51b": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Email",
           "value": "osolab-api-test@example.com",
           "enabled": true,
           "private": true
         },
-        "52ed8bc8-d85f-4b7a-b808-f4a3b43b913e": {
+        "277cf4c1-d9b1-45f9-ae33-1da0cc348956": {
           "createdAt": "2026-05-31T00:00:00.000+09:00",
           "name": "Password",
           "value": "replace-before-run",
           "enabled": true,
           "private": true
+        },
+        "68cbcf13-1eeb-4d1b-8be4-f92ba3c3d04e": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "SignupEmail",
+          "value": "osolab-api-test+signup@example.com",
+          "enabled": true,
+          "private": true
+        },
+        "7dd1a027-83ba-4ec3-b4bd-375d0be59bc5": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "SignupPassword",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "7789a967-7d03-44f1-949d-748619f0f3ad": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "SignupEmailCode",
+          "value": "replace-before-run",
+          "enabled": true,
+          "private": true
+        },
+        "2332c6bb-9e93-4e83-97ea-449f53abe71f": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "Name",
+          "value": "Osolab API Test",
+          "enabled": true,
+          "private": false
+        },
+        "465875e9-d5d2-4aa5-8520-775efbe6585c": {
+          "createdAt": "2026-05-31T00:00:00.000+09:00",
+          "name": "BirthDate",
+          "value": "1990-01-01",
+          "enabled": true,
+          "private": false
         }
       }
     }
