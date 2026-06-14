@@ -1,38 +1,52 @@
 # Password Reset Flow
 
-```text
-User -> AuthPortal
-  Enter login email and birth date.
+```plantuml
+@startuml
+actor User
+participant AuthPortal as portal
+participant AuthFoundation as auth
+database "User Store" as user_store
+participant "Email Sender" as mail
 
-AuthPortal -> AuthFoundation
-  POST /password/reset/start
+== Start password reset ==
+User -> portal : Enter login email and birth date
+portal -> auth : POST /password/reset/start
+note right
+  Body
+    email
+    birth_date
+end note
 
-AuthFoundation -> AuthFoundation
-  Validate email and birth_date format.
+auth -> auth : Validate email and birth_date format
+auth -> user_store : Find user by login email
 
-AuthFoundation -> User Store
-  Find user by login email.
+alt user exists and birth_date matches
+  auth -> mail : Send email_code
+else no user or birth_date mismatch
+  auth -> auth : Do not send email_code
+end
 
-AuthFoundation -> Email Sender
-  Send email_code only when the user exists and birth_date matches.
+auth --> portal : 200 reset_challenge_started
+note right
+  The response does not reveal whether
+  the account or birth date matched.
+end note
 
-AuthFoundation -> AuthPortal
-  200 reset_challenge_started.
-  The response does not reveal whether the account or birth date matched.
+== Complete password reset ==
+User -> portal : Enter email_code and new password
+portal -> auth : POST /password/reset
+note right
+  Body
+    email
+    birth_date
+    email_code
+    new_password
+end note
 
-User -> AuthPortal
-  Enter email_code and new password.
-
-AuthPortal -> AuthFoundation
-  POST /password/reset
-
-AuthFoundation -> AuthFoundation
-  Validate email_code and new password policy.
-  Verify the email_code.
-
-AuthFoundation -> User Store
-  Verify birth_date and update password hash.
-
-AuthFoundation -> AuthPortal
-  200 password_reset
+auth -> auth : Validate email_code and new password policy
+auth -> auth : Verify email_code
+auth -> user_store : Verify birth_date
+auth -> user_store : Update password hash
+auth --> portal : 200 password_reset
+@enduml
 ```
